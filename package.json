@@ -1,0 +1,47 @@
+{
+  "name": "cargolift-types",
+  "version": "0.1.0",
+  "description": "Shared TypeScript types and interfaces for Node.js/NestJS projects",
+  "keywords": ["typescript", "types", "interfaces", "nest", "nestjs", "node"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cargolift-cdi/types.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cargolift-cdi/types/issues"
+  },
+  "homepage": "https://github.com/cargolift-cdi/types#readme",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./dist/index.d.ts"
+  },
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+  "build": "npm run clean && tsc -p tsconfig.json",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "format": "prettier -w .",
+    "test": "tsd",
+    "prepublishOnly": "npm run clean && npm run build && npm test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "eslint": "^9.9.0",
+    "prettier": "^3.3.3",
+    "tsd": "^0.30.6",
+    "typescript": "^5.6.2"
+  }
+}
