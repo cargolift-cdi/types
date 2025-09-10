@@ -1,7 +1,7 @@
 {
   "name": "@cargolift-cdi/types",
-  "version": "0.1.0",
-  "description": "Shared TypeScript types and interfaces for Node.js projects",
+  "version": "0.1.1",
+  "description": "TypeScript types e interfaces comuns para projetos Cargolift CDI",
   "keywords": [
     "typescript",
     "types",
