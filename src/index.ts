@@ -3,4 +3,3 @@
  * Keep exports stable to avoid breaking downstream projects.
  */
 export * from './rabbitmq.interfaces';
-export * from './api.interfaces';
