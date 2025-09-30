@@ -5,3 +5,4 @@
 export * from './rabbitmq.interfaces.js';
 export * from './rabbitmq-envelope-message.js';
 export * from './context-message.interface.js';
+export * from './publish-meta.interface.js';
