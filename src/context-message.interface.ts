@@ -17,7 +17,7 @@ export interface ContextSource {
     ip?: string;
     user_agent?: string;
     client?: string;
-    // application?: string;
+    application?: string;
     user_name?: string;
     user_id?: string;
     user_email?: string;
