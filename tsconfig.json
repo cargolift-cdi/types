@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2021",
+    "target": "ES2023",
     "module": "node16",
     "declaration": true,
     "emitDeclarationOnly": true,
@@ -14,7 +14,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "stripInternal": true,
-    "verbatimModuleSyntax": true
+    "experimentalDecorators": true,
   },
   "include": ["src"],
   "exclude": ["src/nest/**", "test-d/**"]
