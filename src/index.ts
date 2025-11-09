@@ -11,3 +11,5 @@ export * from './entities/integration-inbound.entity.js';
 export * from './entities/integration-outbound.entity.js';
 export * from './entities/repository/integration-inbound-repository.service.js';
 export * from './entities/repository/integration-outbound-repository.service.js';
+export * from './entities/diagnostic-latency.entity.js';
+export * from './entities/repository/diagnostic-latency-repository.service.js';
