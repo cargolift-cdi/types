@@ -6,10 +6,13 @@ export * from './rabbitmq.interfaces.js';
 export * from './rabbitmq-envelope-message.js';
 export * from './context-message.interface.js';
 export * from './publish-meta.interface.js';
-export * from './entities/integration-system.entity.js';
-export * from './entities/integration-inbound.entity.js';
-export * from './entities/integration-outbound.entity.js';
-export * from './entities/repository/integration-inbound-repository.service.js';
-export * from './entities/repository/integration-outbound-repository.service.js';
-export * from './entities/diagnostic-latency.entity.js';
-export * from './entities/repository/diagnostic-latency-repository.service.js';
+
+// Entidades e repositórios TypeORM
+export * from './db/entities/integration-system.entity.js';
+export * from './db/entities/integration-inbound.entity.js';
+export * from './db/entities/integration-outbound.entity.js';
+export * from './db/entities/diagnostic-latency.entity.js';
+
+export * from './db/repository/integration-inbound-repository.service.js';
+export * from './db/repository/integration-outbound-repository.service.js';
+export * from './db/repository/diagnostic-latency-repository.service.js';
