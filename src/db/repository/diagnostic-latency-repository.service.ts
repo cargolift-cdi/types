@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InsertResult, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { DiagnosticLatency } from '../entities/diagnostic-latency.entity.js';
 
 /**
