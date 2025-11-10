@@ -1,14 +1,17 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 /**
  * Entidade de diagnóstico de latência.
- * Armazena o número de hits (requisições / eventos), histórico de log em JSON
- * e timestamps de início e último registro.
+ * Armazena informações sobre a latência de operações, incluindo timestamps de início e fim,
+ * além do ID de correlação para rastreamento.
  */
 @Entity({ name: 'diagnostic_latency' })
 export class DiagnosticLatency {
-  @PrimaryColumn({ type: 'varchar', length: 36 })
-  id!: string;
+  @PrimaryGeneratedColumn({ type: 'int' })
+  id!: number;
+
+  @Column({ type: 'varchar', length: 36 })
+  testId!: string;
 
   @Column({ type: 'varchar', default: 36 })
   correlationId!: string;

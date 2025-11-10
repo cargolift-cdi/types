@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InsertResult, Repository } from 'typeorm';
 import { DiagnosticLatency } from '../entities/diagnostic-latency.entity.js';
 
 /**
@@ -21,18 +21,20 @@ export class DiagnosticLatencyRepositoryService {
    * @param timestamp_start 
    * @returns 
    */
-  async create(id: string, correlation_id: string, timestamp_start: Date): Promise<DiagnosticLatency> {
-
+  async create(
+    testId: string,
+    correlation_id: string,
+    timestamp_start: Date
+  ): Promise<DiagnosticLatency> {
     const now = new Date();
 
-      const entity = this.repo.create({
-        id,
-        correlationId: correlation_id,
-        timestamp_start,
-        timestamp_end: now,
-        latencyMs: now.getTime() - timestamp_start.getTime(),
-      });
-
+    const entity = this.repo.create({
+      testId,
+      correlationId: correlation_id,
+      timestamp_start,
+      timestamp_end: now,
+      latencyMs: now.getTime() - timestamp_start.getTime(),
+    });
 
     return this.repo.save(entity);
   }
