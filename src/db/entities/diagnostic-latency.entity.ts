@@ -24,4 +24,7 @@ export class DiagnosticLatency {
 
   @Column({ type: 'int', default: 0 })
   latencyMs!: number;
+
+  @Column({ type: 'jsonb', nullable: true, default: () => "'{}'::jsonb" })
+  data?: Record<string, any>;
 }

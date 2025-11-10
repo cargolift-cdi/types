@@ -24,7 +24,8 @@ export class DiagnosticLatencyRepositoryService {
   async create(
     testId: string,
     correlation_id: string,
-    timestamp_start: Date
+    timestamp_start: Date,
+    data?: Record<string, any>
   ): Promise<DiagnosticLatency> {
     const now = new Date();
 
@@ -34,6 +35,7 @@ export class DiagnosticLatencyRepositoryService {
       timestamp_start,
       timestamp_end: now,
       latencyMs: now.getTime() - timestamp_start.getTime(),
+      data
     });
 
     return this.repo.save(entity);
