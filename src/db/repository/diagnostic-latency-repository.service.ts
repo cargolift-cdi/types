@@ -22,19 +22,17 @@ export class DiagnosticLatencyRepositoryService {
    * @returns 
    */
   async create(
-    testId: string,
     correlation_id: string,
     timestamp_start: Date,
+    timestamp_end: Date,
     data?: Record<string, any>
   ): Promise<DiagnosticLatency> {
-    const now = new Date();
 
     const entity = this.repo.create({
-      testId,
       correlationId: correlation_id,
       timestamp_start,
-      timestamp_end: now,
-      latencyMs: now.getTime() - timestamp_start.getTime(),
+      timestamp_end,
+      latencyMs: timestamp_end.getTime() - timestamp_start.getTime(),
       data
     });
 
