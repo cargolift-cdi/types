@@ -18,18 +18,23 @@ import { HttpMethod, TransportProtocol } from "./integration.enums.js";
  * Agora inclui também as configurações de Target/Delivery (protocolo, endpoint, templates, políticas, etc.).
  */
 @Entity({ name: "integration_endpoint" })
-@Index(["name", "active"], { unique: true })
+@Index(["system", "event", "active"], { unique: true })
 @Index(["credentialId"])
 export class IntegrationEndpoint {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  /** Sistema do endpoint (e.g., 'tms') */
+  /** Sistema de destino (e.g., 'erp', 'wms') */
+  @Column({ name: "target_system", type: "varchar", length: 80 })
+  system!: string;
+
+  /** Evento (chave) (e.g., 'driver' or 'driver.created') */
   @Column({ type: "varchar", length: 80 })
-  name!: string;
+  event!: string;
 
   @Column({ type: "boolean", default: true })
   active!: boolean;
+  
 
   /** ===================== Target/Delivery (simplificado no próprio Outbound) ===================== */
 

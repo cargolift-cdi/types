@@ -39,7 +39,6 @@ import {
  */
 @Entity({ name: "integration_outbound" })
 @Index(["system", "event", "targetSystem", "version"], { unique: true })
-@Index(["endpointId"])
 export class IntegrationOutbound {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
@@ -71,10 +70,6 @@ export class IntegrationOutbound {
   /** Se a rota está ativa */
   @Column({ type: "boolean", default: true })
   active!: boolean;
-
-  /* Referência o perfil de endpoint  (IntegrationEndpoint.id). */
-  @Column({ name: "endpoint_id", type: "uuid", nullable: true })
-  endpointId?: string | null;
 
   /** Opções adicionais (reservado para uso futuro) */
   @Column({ type: "jsonb", nullable: true })

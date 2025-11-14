@@ -11,7 +11,7 @@ export class CredentialRepositoryService {
     private readonly repo: Repository<IntegrationCredential>,
   ) {}
 
-  async findOne(credentialId: string): Promise<IntegrationCredential | null> {
-    return await this.repo.findOne({ where: { id: credentialId, active: true } as any});
+  async find(credentialId: string): Promise<IntegrationCredential | null> {
+    return await this.repo.findOne({ where: { id: credentialId, active: true }});
   }  
 }

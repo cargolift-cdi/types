@@ -1,22 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { IntegrationOutbound } from '../entities/integration/integration-outbound.entity.js';
-
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { IntegrationOutbound } from "../entities/integration/integration-outbound.entity.js";
 
 @Injectable()
 export class OutboundRepositoryService {
   constructor(
     @InjectRepository(IntegrationOutbound)
-    private readonly repo: Repository<IntegrationOutbound>,
+    private readonly repo: Repository<IntegrationOutbound>
   ) {}
 
   async getRoutes(system: string, event: string): Promise<IntegrationOutbound[]> {
-    return this.repo.find({ where: { system, event, active: true }, order: { version: 'DESC' } as any });
+    return this.repo.find({ where: { system, event, active: true }, order: { version: "DESC" } as any });
   }
 
-
-  async findOne(system: string, event: string): Promise<IntegrationOutbound | null> {
-    return this.repo.findOne({ where: { system, event, active: true }, order: { version: 'DESC' } as any });
-  }  
+  async find(system: string, event: string): Promise<IntegrationOutbound | null> {
+    return this.repo.findOne({ where: { system, event, active: true }, order: { version: "DESC" } as any });
+  }
 }

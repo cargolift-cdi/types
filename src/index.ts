@@ -20,4 +20,6 @@ export * from './db/entities/diagnostic-latency.entity.js';
 // Repositórios
 export * from './db/repository/integration-inbound-repository.service.js';
 export * from './db/repository/integration-outbound-repository.service.js';
+export * from './db/repository/integration-endpoint-repository.service.js';
+export * from './db/repository/integration-credential-repository.service.js';
 export * from './db/repository/diagnostic-latency-repository.service.js';
