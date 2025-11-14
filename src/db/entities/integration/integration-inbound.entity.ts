@@ -55,9 +55,10 @@ export class IntegrationInbound {
   @Column({ type: "jsonb", nullable: true })
   options?: Record<string, any> | null;
 
-  @CreateDateColumn({ type: "timestamptz" })
+  @CreateDateColumn({ name: "create_at", type: "timestamptz" })
   createdAt!: Date;
 
-  @UpdateDateColumn({ type: "timestamptz" })
+  @UpdateDateColumn({ name: "update_at", type: "timestamptz" })
   updatedAt!: Date;
+
 }

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, Index } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, Index, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({ name: 'integration_system' })
 export class IntegrationSystem {
@@ -14,5 +14,12 @@ export class IntegrationSystem {
   /** Se o sistema está ativo */
   @Column({ type: 'boolean', default: true })
   active!: boolean;
+
+  @CreateDateColumn({ name: "create_at", type: "timestamptz" })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ name: "update_at", type: "timestamptz" })
+  updatedAt!: Date;
+
 }
 
