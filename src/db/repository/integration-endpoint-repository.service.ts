@@ -10,6 +10,7 @@ export class EndpointRepositoryService {
   constructor(
     @InjectRepository(IntegrationEndpoint)
     private readonly repo: Repository<IntegrationEndpoint>,
+    @InjectRepository(IntegrationCredential)
     private readonly repoCredential: Repository<IntegrationCredential>,
   ) {}
 

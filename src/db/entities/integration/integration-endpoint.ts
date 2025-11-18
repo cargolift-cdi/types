@@ -125,6 +125,25 @@ export class IntegrationEndpoint {
   } | null;
 
   /**
+   * Política de circuit breaker opcional por endpoint.
+   * { threshold?: number; openMs?: number; halfOpenMaxAttempts?: number }
+   */
+  @Column({ name: "breaker_policy", type: "jsonb", nullable: true })
+  breakerPolicy?: {
+    threshold?: number;
+    openMs?: number;
+    halfOpenMaxAttempts?: number;
+  } | null;
+
+  /**
+   * Concorrência máxima local por endpoint nesta instância.
+   * Controla quantas requisições simultâneas este endpoint pode ter por processo.
+   * Default: 1 (serialização local).
+   */
+  @Column({ name: "max_concurrent_per_endpoint", type: "int", nullable: true })
+  maxConcurrentPerEndpoint?: number | null;
+
+  /**
    * Idempotência:
    * { strategy: 'header' | 'bodyHash' | 'custom', headerName?: 'Idempotency-Key', ttlMs?: 300000 }
    */
