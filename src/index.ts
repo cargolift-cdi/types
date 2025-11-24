@@ -2,10 +2,10 @@
  * Public export surface for shared types.
  * Keep exports stable to avoid breaking downstream projects.
  */
-export * from './rabbitmq.interfaces.js';
-export * from './rabbitmq-envelope-message.js';
-export * from './context-message.interface.js';
-export * from './publish-meta.interface.js';
+export * from './interfaces/rabbitmq.interfaces.js';
+export * from './interfaces/envelope-message.interface.js';
+export * from './interfaces/context-message.interface.js';
+export * from './interfaces/publish-meta.interface.js';
 
 // Entidades
 export * from './db/entities/integration/integration.enums.js';

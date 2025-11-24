@@ -55,6 +55,10 @@ export class IntegrationOutbound {
   @Column({ type: "varchar", length: 80 })
   event!: string;
 
+  /** Ação (e.g., 'create', 'update', 'delete', etc */
+  @Column({ type: "varchar", length: 10 })
+  action!: string;  
+
   /** Versão da rota. Apenas a última versão pode estar ativa. Versões anteriores não podem sofrer modificações */
   @Column({ type: "int", default: 1 })
   version!: number;

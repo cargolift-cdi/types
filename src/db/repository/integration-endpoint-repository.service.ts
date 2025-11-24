@@ -14,12 +14,12 @@ export class EndpointRepositoryService {
     private readonly repoCredential: Repository<IntegrationCredential>,
   ) {}
 
-  async find(system: string, event: string): Promise<IntegrationEndpoint | null> {
-    return await this.repo.findOne({ where: { system, event, active: true }});
+  async find(system: string, event: string, action: string): Promise<IntegrationEndpoint | null> {
+    return await this.repo.findOne({ where: { system, event, action, active: true }});
   }
 
   async getCredential(endpoint: IntegrationEndpoint): Promise<IntegrationCredential | null> {
     if (!endpoint?.credentialId) return null;
     return await this.repoCredential.findOne({ where: { id: endpoint.credentialId, active: true }});
-  }      
+  }
 }

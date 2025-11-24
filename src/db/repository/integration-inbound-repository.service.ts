@@ -11,9 +11,9 @@ export class InboundRepositoryService {
     private readonly repo: Repository<IntegrationInbound>
   ) {}
 
-  async getEvent(system: string, event: string): Promise<IntegrationInbound[]> {
+  async getEvent(system: string, event: string, action: string): Promise<IntegrationInbound[]> {
     return this.repo.find({
-      where: { system, event, active: true },
+      where: { system, event, action, active: true },
       order: { version: "DESC" } as any,
     })
     .then((events) => {

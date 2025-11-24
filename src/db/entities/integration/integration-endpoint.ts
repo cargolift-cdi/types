@@ -32,9 +32,12 @@ export class IntegrationEndpoint {
   @Column({ type: "varchar", length: 80 })
   event!: string;
 
+  /** Ação (e.g., 'create', 'update', 'delete', etc */
+  @Column({ type: "varchar", length: 10 })
+  action!: string;  
+
   @Column({ type: "boolean", default: true })
   active!: boolean;
-  
 
   /** ===================== Target/Delivery (simplificado no próprio Outbound) ===================== */
 
@@ -119,6 +122,7 @@ export class IntegrationEndpoint {
    */
   @Column({ name: "rate_limit", type: "jsonb", nullable: true })
   rateLimit?: {
+    strategy?: 'fixed-window' | 'token-bucket';
     limit?: number;
     intervalMs?: number;
     burst?: number;

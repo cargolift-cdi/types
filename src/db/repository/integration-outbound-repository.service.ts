@@ -10,11 +10,11 @@ export class OutboundRepositoryService {
     private readonly repo: Repository<IntegrationOutbound>
   ) {}
 
-  async getRoutes(system: string, event: string): Promise<IntegrationOutbound[]> {
-    return this.repo.find({ where: { system, event, active: true }, order: { version: "DESC" } as any });
+  async getRoutes(system: string, event: string, action: string): Promise<IntegrationOutbound[]> {
+    return this.repo.find({ where: { system, event, action, active: true }, order: { version: "DESC" } as any });
   }
 
-  async find(system: string, event: string): Promise<IntegrationOutbound | null> {
-    return this.repo.findOne({ where: { system, event, active: true }, order: { version: "DESC" } as any });
+  async find(system: string, event: string, action: string): Promise<IntegrationOutbound | null> {
+    return this.repo.findOne({ where: { system, event, action, active: true }, order: { version: "DESC" } as any });
   }
 }
