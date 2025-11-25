@@ -39,7 +39,7 @@ import {
  * Agora inclui também as configurações de Target/Delivery (protocolo, endpoint, templates, políticas, etc.).
  */
 @Entity({ name: "integration_outbound" })
-@Index(["system", "event", "targetSystem", "version"], { unique: true })
+@Index(["system", "event", "action", "targetSystem", "version"], { unique: true })
 export class IntegrationOutbound {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
@@ -47,10 +47,6 @@ export class IntegrationOutbound {
   /** Sistema de origem (e.g., 'tms') */
   @Column({ type: "varchar", length: 80 })
   system!: string;
-
-  /** Sistema de destino (e.g., 'erp', 'wms') */
-  @Column({ name: "target_system", type: "varchar", length: 80 })
-  targetSystem!: string;
 
   /** Evento (chave) (e.g., 'driver' or 'driver.created') */
   @Column({ type: "varchar", length: 80 })
@@ -60,9 +56,19 @@ export class IntegrationOutbound {
   @Column({ type: "varchar", length: 40 })
   action!: string;  
 
+  /** Sistema de destino (e.g., 'erp', 'wms') */
+  @Column({ name: "target_system", type: "varchar", length: 80 })
+  targetSystem!: string;
+
+
   /** Versão da rota. Apenas a última versão pode estar ativa. Versões anteriores não podem sofrer modificações */
   @Column({ type: "int", default: 1 })
   version!: number;
+
+  /** Se a rota está ativa */
+  @Column({ type: "boolean", default: true })
+  active!: boolean;
+
 
   /** Descrição */
   @Column({ type: "varchar", length: 500, nullable: true })
@@ -70,11 +76,7 @@ export class IntegrationOutbound {
 
   /** Regras (BRE RulesConfiguration) */
   @Column({ type: "jsonb" })
-  rules!: Record<string, any>;
-
-  /** Se a rota está ativa */
-  @Column({ type: "boolean", default: true })
-  active!: boolean;
+  rules?: Record<string, any>;
 
   /** Opções adicionais (reservado para uso futuro) */
   @Column({ type: "jsonb", nullable: true })

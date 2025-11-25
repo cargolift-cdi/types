@@ -14,7 +14,7 @@ import {
  * Também armazena configurações de regras global (BRE) associadas ao evento.
  */
 @Entity({ name: "integration_inbound" })
-@Index(["system", "event", "version"], { unique: true })
+@Index(["system", "event", "action", "version"], { unique: true })
 export class IntegrationInbound {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
@@ -35,6 +35,10 @@ export class IntegrationInbound {
   @Column({ type: "int", default: 1 })
   version!: number;  
 
+  /**Se a rota está ativa */
+  @Column({ type: "boolean", default: true })
+  active!: boolean;
+
   /** Descrição opcional amigável ao usuário */
   @Column({ type: "varchar", length: 500, nullable: true })
   description?: string | null;
@@ -50,10 +54,6 @@ export class IntegrationInbound {
   /** Regra global (BRE RulesConfiguration) */
   @Column({ type: 'jsonb', nullable: true })
   rules!: Record<string, any>;
-
-  /**Se a rota está ativa */
-  @Column({ type: "boolean", default: true })
-  active!: boolean;
 
   /** Opções adicionais (reservado para uso futuro) */
   @Column({ type: "jsonb", nullable: true })

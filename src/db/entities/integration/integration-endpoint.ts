@@ -18,7 +18,7 @@ import { HttpMethod, TransportProtocol } from "./integration.enums.js";
  * Agora inclui também as configurações de Target/Delivery (protocolo, endpoint, templates, políticas, etc.).
  */
 @Entity({ name: "integration_endpoint" })
-@Index(["system", "event", "active"], { unique: true })
+@Index(["system", "event", "action"], { unique: true })
 @Index(["credentialId"])
 export class IntegrationEndpoint {
   @PrimaryGeneratedColumn("uuid")
