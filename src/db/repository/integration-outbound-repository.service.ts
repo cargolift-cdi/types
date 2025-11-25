@@ -11,10 +11,76 @@ export class OutboundRepositoryService {
   ) {}
 
   async getRoutes(system: string, event: string, action: string): Promise<IntegrationOutbound[]> {
-    return this.repo.find({ where: { system, event, action, active: true }, order: { version: "DESC" } as any });
+    const qb = this.repo
+      .createQueryBuilder("integration_outbound")
+      .where("integration_outbound.system = :system", { system })
+      .andWhere("integration_outbound.event = :event", { event })
+      .andWhere("integration_outbound.active = :active", { active: true })
+      .andWhere(
+        `(
+          integration_outbound.action = 'all' OR
+          integration_outbound.action = :action OR
+          integration_outbound.action LIKE :actionListPrefix OR
+          integration_outbound.action LIKE :actionListInfix OR
+          integration_outbound.action LIKE :actionListSuffix
+        )`,
+        {
+          action,
+          actionListPrefix: `${action},%`,
+          actionListInfix: `%,${action},%`,
+          actionListSuffix: `%,${action}`,
+        }
+      )
+      .orderBy(
+        `CASE
+          WHEN integration_outbound.action = :action THEN 1
+          WHEN integration_outbound.action LIKE :actionListPrefix OR
+               integration_outbound.action LIKE :actionListInfix OR
+               integration_outbound.action LIKE :actionListSuffix THEN 2
+          WHEN integration_outbound.action = 'all' THEN 3
+          ELSE 4
+        END`,
+        "ASC"
+      )
+      .addOrderBy("integration_outbound.version", "DESC");
+
+    return qb.getMany();
   }
 
   async find(system: string, event: string, action: string): Promise<IntegrationOutbound | null> {
-    return this.repo.findOne({ where: { system, event, action, active: true }, order: { version: "DESC" } as any });
+    const qb = this.repo
+      .createQueryBuilder("integration_outbound")
+      .where("integration_outbound.system = :system", { system })
+      .andWhere("integration_outbound.event = :event", { event })
+      .andWhere("integration_outbound.active = :active", { active: true })
+      .andWhere(
+        `(
+          integration_outbound.action = 'all' OR
+          integration_outbound.action = :action OR
+          integration_outbound.action LIKE :actionListPrefix OR
+          integration_outbound.action LIKE :actionListInfix OR
+          integration_outbound.action LIKE :actionListSuffix
+        )`,
+        {
+          action,
+          actionListPrefix: `${action},%`,
+          actionListInfix: `%,${action},%`,
+          actionListSuffix: `%,${action}`,
+        }
+      )
+      .orderBy(
+        `CASE
+          WHEN integration_outbound.action = :action THEN 1
+          WHEN integration_outbound.action LIKE :actionListPrefix OR
+               integration_outbound.action LIKE :actionListInfix OR
+               integration_outbound.action LIKE :actionListSuffix THEN 2
+          WHEN integration_outbound.action = 'all' THEN 3
+          ELSE 4
+        END`,
+        "ASC"
+      )
+      .addOrderBy("integration_outbound.version", "DESC");
+
+    return qb.getOne();
   }
 }

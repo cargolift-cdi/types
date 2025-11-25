@@ -11,17 +11,55 @@ export class InboundRepositoryService {
     private readonly repo: Repository<IntegrationInbound>
   ) {}
 
-  async getEvent(system: string, event: string, action: string): Promise<IntegrationInbound[]> {
-    return this.repo.find({
-      where: { system, event, action, active: true },
-      order: { version: "DESC" } as any,
-    })
-    .then((events) => {
-      return events;
-    })
-    .catch((err) => {
-      throw err;
-    });
+  async get(system: string, event: string, action: string): Promise<IntegrationInbound[]> {
+    const qb = this.repo
+      .createQueryBuilder("integration_inbound")
+      .where("integration_inbound.system = :system", { system })
+      .andWhere("integration_inbound.event = :event", { event })
+      .andWhere("integration_inbound.active = :active", { active: true })
+      .andWhere(
+        `(
+          integration_inbound.action = 'all' OR
+          integration_inbound.action = :action OR
+          integration_inbound.action LIKE :actionListPrefix OR
+          integration_inbound.action LIKE :actionListInfix OR
+          integration_inbound.action LIKE :actionListSuffix
+        )`,
+        {
+          action,
+          actionListPrefix: `${action},%`,
+          actionListInfix: `%,${action},%`,
+          actionListSuffix: `%,${action}`,
+        }
+      );
+
+    const rows = await qb
+      .orderBy(
+        `CASE
+          WHEN integration_inbound.action = :action THEN 1
+          WHEN integration_inbound.action LIKE :actionListPrefix OR
+               integration_inbound.action LIKE :actionListInfix OR
+               integration_inbound.action LIKE :actionListSuffix THEN 2
+          WHEN integration_inbound.action = 'all' THEN 3
+          ELSE 4
+        END`,
+        "ASC"
+      )
+      .addOrderBy("integration_inbound.system", "ASC")
+      .addOrderBy("integration_inbound.event", "ASC")
+      .addOrderBy("integration_inbound.version", "DESC")
+      .getMany();
+
+    const resultMap = new Map<string, IntegrationInbound>();
+
+    for (const row of rows) {
+      const key = `${row.system}::${row.event}`;
+      if (!resultMap.has(key)) {
+        resultMap.set(key, row);
+      }
+    }
+
+    return Array.from(resultMap.values());
   }
 
   /*

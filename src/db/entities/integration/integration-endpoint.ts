@@ -33,7 +33,7 @@ export class IntegrationEndpoint {
   event!: string;
 
   /** Ação (e.g., 'create', 'update', 'delete', etc */
-  @Column({ type: "varchar", length: 10 })
+  @Column({ type: "varchar", length: 40 })
   action!: string;  
 
   @Column({ type: "boolean", default: true })

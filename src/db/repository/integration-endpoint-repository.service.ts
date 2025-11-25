@@ -15,7 +15,40 @@ export class EndpointRepositoryService {
   ) {}
 
   async find(system: string, event: string, action: string): Promise<IntegrationEndpoint | null> {
-    return await this.repo.findOne({ where: { system, event, action, active: true }});
+    const qb = this.repo
+      .createQueryBuilder('integration_endpoint')
+      .where('integration_endpoint.system = :system', { system })
+      .andWhere('integration_endpoint.event = :event', { event })
+      .andWhere('integration_endpoint.active = :active', { active: true })
+      .andWhere(
+        `(
+          integration_endpoint.action = 'all' OR
+          integration_endpoint.action = :action OR
+          integration_endpoint.action LIKE :actionListPrefix OR
+          integration_endpoint.action LIKE :actionListInfix OR
+          integration_endpoint.action LIKE :actionListSuffix
+        )`,
+        {
+          action,
+          actionListPrefix: `${action},%`,
+          actionListInfix: `%,${action},%`,
+          actionListSuffix: `%,${action}`,
+        },
+      )
+      .orderBy(
+        `CASE
+          WHEN integration_endpoint.action = :action THEN 1
+          WHEN integration_endpoint.action LIKE :actionListPrefix OR
+               integration_endpoint.action LIKE :actionListInfix OR
+               integration_endpoint.action LIKE :actionListSuffix THEN 2
+          WHEN integration_endpoint.action = 'all' THEN 3
+          ELSE 4
+        END`,
+        'ASC',
+      )
+      .addOrderBy('integration_endpoint.version', 'DESC');
+
+    return await qb.getOne();
   }
 
   async getCredential(endpoint: IntegrationEndpoint): Promise<IntegrationCredential | null> {

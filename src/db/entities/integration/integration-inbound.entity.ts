@@ -28,7 +28,7 @@ export class IntegrationInbound {
   event!: string;
 
     /** Ação (e.g., 'create', 'update', 'delete', etc */
-  @Column({ type: "varchar", length: 10 })
+  @Column({ type: "varchar", length: 40 })
   action!: string;
 
   /** Versão da rota. Apenas a última versão pode estar ativa. Versões anteriores não podem sofrer modificações */
