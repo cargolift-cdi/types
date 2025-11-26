@@ -9,21 +9,7 @@
  * - Há um índice único composto por (system, event, targetSystem, version) garantindo que
  *   não existam duplicatas de rota para a mesma combinação.
  * - Somente a versão mais recente de uma rota pode estar ativa; versões anteriores devem ser imutáveis.
- *
- * @property id UUID gerada automaticamente que identifica unicamente a rota.
- * @property system Sistema de origem (ex.: "tms"), usado para agrupar/filtrar rotas por emissor.
- * @property targetSystem Sistema de destino (ex.: "erp", "wms") para o qual o evento será encaminhado.
- * @property event Chave do evento (ex.: "driver", "driver.created") que aciona esta rota.
- * @property version Versão da rota. Versões anteriores não devem ser modificadas; apenas a última pode estar ativa.
- * @property description Texto descritivo opcional da rota (até 500 caracteres).
- * @property rules Configuração de regras (BRE) em formato JSONB utilizada para avaliar/executar o roteamento.
- * @property active Indicador se a rota está ativa e deve ser considerada pelo mecanismo de envio.
- * @property options Campo JSONB opcional para opções adicionais de roteamento (reservado para uso futuro).
- * @property createdAt Timestamp (timestamptz) de criação do registro.
- * @property updatedAt Timestamp (timestamptz) da última atualização do registro.
  */
-// src/integration/entities/integration-outbound.entity.ts
-// 
 import {
   Column,
   CreateDateColumn,
@@ -34,15 +20,17 @@ import {
 } from "typeorm";
 
 
-/**
- * Definição de roteamento de saída por chave (evento) e destino.
- * Agora inclui também as configurações de Target/Delivery (protocolo, endpoint, templates, políticas, etc.).
- */
+
 @Entity({ name: "integration_outbound" })
 @Index(["system", "event", "action", "targetSystem", "version"], { unique: true })
+@Index("uq_integration_outbound_active", ["system", "event", "action", "targetSystem"], {
+  unique: true,
+  where: `"active" = true`,
+})
 export class IntegrationOutbound {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  /** Identificador único do sistema de integração */
+  @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
+  id!: string; // manter string no TS para bigint seguro
 
   /** Sistema de origem (e.g., 'tms') */
   @Column({ type: "varchar", length: 80 })
@@ -52,7 +40,7 @@ export class IntegrationOutbound {
   @Column({ type: "varchar", length: 80 })
   event!: string;
 
-    /** Ação (e.g., 'create', 'update', 'delete', etc */
+  /** Ação (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
   action!: string;  
 
@@ -75,17 +63,18 @@ export class IntegrationOutbound {
   description?: string | null;
 
   /** Regras (BRE RulesConfiguration) */
-  @Column({ type: "jsonb" })
+  @Column({ type: "jsonb", default: () => "'{}'::jsonb" })
   rules?: Record<string, any>;
 
   /** Opções adicionais (reservado para uso futuro) */
-  @Column({ type: "jsonb", nullable: true })
-  options?: Record<string, any> | null;
+  // @Column({ type: "jsonb", nullable: true })
+  // options?: Record<string, any> | null;
 
-  @CreateDateColumn({ name: "create_at", type: "timestamptz" })
+  @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: "update_at", type: "timestamptz" })
+  @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
   updatedAt!: Date;
+  
 
 }

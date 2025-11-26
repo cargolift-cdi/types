@@ -1,7 +1,72 @@
 /**
+ * Definição de roteamento e configuração de entrega/saída para eventos de integração (Outbound).
+ *
+ * Representa uma rota/endpoint de destino para um evento específico, incluindo
+ * informações de transporte, endpoint, credenciais, políticas de retry, rate-limiting,
+ * circuit breaker, idempotência e configurações específicas por protocolo (HTTP, filas/streams).
+ *
+ * Observações importantes:
+ * - A combinação (system, event, action) é única. Há também um índice condicional que garante
+ *   unicidade quando active = true (ou seja, apenas uma rota ativa por chave).
+ * - O campo `id` é um bigint no banco — no TypeScript é mantido como string para segurança.
+ * 
+ * @remarks
+ * - Esta entidade centraliza tanto o roteamento (por sistema/evento/ação) quanto as políticas e
+ *   configurações de entrega, permitindo múltiplos tipos de transporte e adaptações por destino.
+ * - Campos JSONB (httpConfig, queueConfig, tls, retryPolicy, rateLimit, breakerPolicy, idempotency)
+ *   devem seguir os formatos esperados pelo componente de entrega para serem interpretados corretamente.* 
+ *
+ * @property transportProtocol Protocolo de transporte usado para a entrega (ex.: 'REST', 'SOAP', 'AMQP', 'KAFKA').
+ * @property endpoint Endpoint principal/URI/host/connection string dependente do protocolo:
+ * - HTTP(S): baseUrl (ex.: https://api.exemplo.com)
+ * - AMQP: amqp://broker:5672
+ * - Kafka: broker1:9092,broker2:9092
+ * - SQS/PubSub: ARN, tópico ou projeto+tópico
+ *
+ * @property httpConfig Configurações específicas quando transportProtocol é HTTP/REST.
+ *   Estrutura típica:
+ *   {
+ *     method?: 'POST'|'PUT'|'PATCH'|'GET'|'DELETE',
+ *     pathTemplate?: string,                // ex.: /v1/drivers/{{id}}
+ *     headersTemplate?: Record<string,string>,
+ *     queryTemplate?: Record<string,any>,
+ *     bodyTemplate?: any,                   // JSONata / Liquid / Handlebars
+ *     contentType?: string,                 // ex.: 'application/json'
+ *     timeoutMs?: number,
+ *     compression?: { type?: 'gzip'|'deflate'|'br' }
+ *   }
+ *
+ * @property queueConfig Configurações para filas/streams quando transportProtocol é AMQP/Kafka/SQS/PubSub.
+ *   Estrutura típica:
+ *   {
+ *     topic?: string,
+ *     queue?: string,
+ *     exchange?: string,
+ *     routingKey?: string,
+ *     partitionKey?: string,
+ *     messageKey?: string,
+ *     headersTemplate?: Record<string,string>,
+ *     properties?: Record<string,any>, // propriedades específicas do broker
+ *     payloadTemplate?: any
+ *   }
+ *
+ * @example Exemplo de httpConfig:
+ * {
+ *   method: 'POST',
+ *   pathTemplate: '/v1/drivers/{{id}}',
+ *   headersTemplate: { 'Authorization': 'Bearer {{token}}', 'Content-Type': 'application/json' },
+ *   bodyTemplate: { id: '{{id}}', name: '{{name}}' },
+ *   timeoutMs: 5000
+ * }
+ *
+ * @example Exemplo de queueConfig para Kafka:
+ * {
+ *   topic: 'drivers.created',
+ *   partitionKey: '{{id}}',
+ *   headersTemplate: { correlationId: '{{correlationId}}' },
+ *   payloadTemplate: { id: '{{id}}', payload: '{{payload}}' }
+ * }
  */
-// src/integration/entities/integration-outbound.entity.ts
-// 
 import {
   Column,
   CreateDateColumn,
@@ -18,11 +83,14 @@ import { HttpMethod, TransportProtocol } from "./integration.enums.js";
  * Agora inclui também as configurações de Target/Delivery (protocolo, endpoint, templates, políticas, etc.).
  */
 @Entity({ name: "integration_endpoint" })
-@Index(["system", "event", "action"], { unique: true })
-@Index(["credentialId"])
+@Index("uq_integration_endpoint_active", ["system", "event", "action"], {
+  unique: true,
+  where: `"active" = true`,
+})
 export class IntegrationEndpoint {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
+  id!: string; // manter string no TS para bigint seguro
+
 
   /** Sistema de destino (e.g., 'erp', 'wms') */
   @Column({ name: "target_system", type: "varchar", length: 80 })
@@ -32,9 +100,12 @@ export class IntegrationEndpoint {
   @Column({ type: "varchar", length: 80 })
   event!: string;
 
-  /** Ação (e.g., 'create', 'update', 'delete', etc */
+  /** Ação (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
-  action!: string;  
+  action!: string;
+
+  @Column({ type: "int", default: 1 })
+  version!: number;    
 
   @Column({ type: "boolean", default: true })
   active!: boolean;
@@ -57,8 +128,8 @@ export class IntegrationEndpoint {
   @Column({ type: "varchar", length: 500 })
   endpoint!: string;
 
-  @Column({ name: "http_method", type: "varchar", length: 10, default: 'POST' })
-  httpMethod!: HttpMethod;
+  @Column({ name: "http_method", type: "varchar", length: 10, default: 'POST', nullable: true })
+  httpMethod!: HttpMethod | null;
 
   /**
    * Config HTTP específica (quando transport = 'http'):
@@ -93,7 +164,7 @@ export class IntegrationEndpoint {
   /**
    * Referência a credenciais reutilizáveis (IntegrationCredential.id).
    */
-  @Column({ name: "credential_id", type: "uuid", nullable: true })
+  @Column({ name: "credential_id", type: "bigint", nullable: true })
   credentialId?: string | null;
 
   /**
@@ -154,10 +225,10 @@ export class IntegrationEndpoint {
   @Column({ type: "jsonb", nullable: true })
   idempotency?: Record<string, any> | null;
 
-  @CreateDateColumn({ name: "create_at", type: "timestamptz" })
+  @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: "update_at", type: "timestamptz" })
+  @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
   updatedAt!: Date;
 
 }

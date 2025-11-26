@@ -1,3 +1,16 @@
+
+/**
+ * Representa uma rota de integração de entrada (inbound) que descreve como eventos externos
+ * devem ser validados, transformados e aplicados às regras globais antes do roteamento interno.
+ *
+ * @remarks
+ * - Cada combinação (system, event, action, version) é única.
+ * - Apenas uma versão por (system, event, action) pode estar ativa ao mesmo tempo.
+ * - Versões anteriores devem ser imutáveis após a publicação de novas versões.
+ * - Transformações usam expressões JSONata para mapear payloads externos ao formato canônico interno.
+ *
+
+ */
 import {
   Column,
   CreateDateColumn,
@@ -15,9 +28,14 @@ import {
  */
 @Entity({ name: "integration_inbound" })
 @Index(["system", "event", "action", "version"], { unique: true })
+@Index("uq_integration_inbound_active", ["system", "event", "action"], {
+  unique: true,
+  where: `"active" = true`,
+})
+
 export class IntegrationInbound {
-  @PrimaryGeneratedColumn("uuid")
-  id!: string;
+  @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
+  id!: string; // manter string no TS para bigint seguro
 
   /** Sistema de origem (e.g., 'erp') */
   @Column({ type: "varchar", length: 80 })
@@ -45,24 +63,24 @@ export class IntegrationInbound {
 
   /** Pré-validação do payload de origem  */
   @Column({ type: "jsonb", nullable: true })
-  validation!: Record<string, any>;
+  validation?: Record<string, any> | null;
 
   /** Expressão JSONata  */
   @Column({ type: "text", nullable: true })
-  transformation!: string;
+  transformation?: string | null;
 
   /** Regra global (BRE RulesConfiguration) */
   @Column({ type: 'jsonb', nullable: true })
-  rules!: Record<string, any>;
+  rules?: Record<string, any> | null;
 
   /** Opções adicionais (reservado para uso futuro) */
   @Column({ type: "jsonb", nullable: true })
   options?: Record<string, any> | null;
 
-  @CreateDateColumn({ name: "create_at", type: "timestamptz" })
+  @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
-  @UpdateDateColumn({ name: "update_at", type: "timestamptz" })
+  @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
   updatedAt!: Date;
 
 }
