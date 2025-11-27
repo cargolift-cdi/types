@@ -1,4 +1,4 @@
-import { HttpMethod } from "./integration.enums.js";
+import { HttpMethod } from "../../../enum/integration.enums.js";
 
 export interface EndpointHttpConfig {
   method: HttpMethod;

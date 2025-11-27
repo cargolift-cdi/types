@@ -39,7 +39,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { AuthType } from './integration.enums.js';
+import { AuthType } from '../../../enum/integration.enums.js';
 
 
 /**

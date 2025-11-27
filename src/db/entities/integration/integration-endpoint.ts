@@ -75,7 +75,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { HttpMethod, TransportProtocol } from "./integration.enums.js";
+import { HttpMethod, TransportProtocol } from "../../../enum/integration.enums.js";
 import { EndpointBreakerPolicy, EndpointHttpConfig, EndpointQueueConfig, EndpointRateLimitConfig, EndpointRetryPolicy, EndpointTlsConfig } from "./integration.interface.js";
 
 
