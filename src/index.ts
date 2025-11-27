@@ -6,6 +6,7 @@ export * from './interfaces/rabbitmq.interfaces.js';
 export * from './interfaces/envelope-message.interface.js';
 export * from './interfaces/context-message.interface.js';
 export * from './interfaces/publish-meta.interface.js';
+export * from './interfaces/api-response.interface.js';
 
 // Entidades
 export * from './db/entities/integration/integration.enums.js';

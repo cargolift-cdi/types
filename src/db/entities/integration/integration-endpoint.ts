@@ -76,6 +76,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { HttpMethod, TransportProtocol } from "./integration.enums.js";
+import { EndpointBreakerPolicy, EndpointHttpConfig, EndpointQueueConfig, EndpointRateLimitConfig, EndpointRetryPolicy, EndpointTlsConfig } from "./integration.interface.js";
 
 
 /**
@@ -128,8 +129,21 @@ export class IntegrationEndpoint {
   @Column({ type: "varchar", length: 500 })
   endpoint!: string;
 
-  @Column({ name: "http_method", type: "varchar", length: 10, default: 'POST', nullable: true })
-  httpMethod!: HttpMethod | null;
+  /**
+   * Referência a credenciais reutilizáveis (IntegrationCredential.id).
+   */
+  @Column({ name: "credential_id", type: "bigint", nullable: true })
+  credentialId?: string | null;
+
+  /**
+   * Opções de TLS/MTLS, certificados, SNI etc.
+   * Ex.: { rejectUnauthorized: true, ca?: string, cert?: string, key?: string, servername?: string }
+   */
+  @Column({ type: "jsonb", nullable: true })
+  tls?: EndpointTlsConfig | null;  
+
+  // @Column({ name: "http_method", type: "varchar", length: 10, default: 'POST', nullable: true })
+  // httpMethod!: HttpMethod | null;
 
   /**
    * Config HTTP específica (quando transport = 'http'):
@@ -145,7 +159,7 @@ export class IntegrationEndpoint {
    * }
    */
   @Column({ name: "http_config", type: "jsonb", nullable: true })
-  httpConfig?: Record<string, any> | null;
+  httpConfig?: EndpointHttpConfig | null;
 
   /**
    * Config de fila/stream (quando transport = 'amqp' | 'kafka' | 'sqs' | 'pubsub'):
@@ -158,57 +172,29 @@ export class IntegrationEndpoint {
    * }
    */
   @Column({ name: "queue_config", type: "jsonb", nullable: true })
-  queueConfig?: Record<string, any> | null;
+  queueConfig?: EndpointQueueConfig| null;
 
-
-  /**
-   * Referência a credenciais reutilizáveis (IntegrationCredential.id).
-   */
-  @Column({ name: "credential_id", type: "bigint", nullable: true })
-  credentialId?: string | null;
-
-  /**
-   * Opções de TLS/MTLS, certificados, SNI etc.
-   * Ex.: { rejectUnauthorized: true, ca?: string, cert?: string, key?: string, servername?: string }
-   */
-  @Column({ type: "jsonb", nullable: true })
-  tls?: Record<string, any> | null;
 
   /**
    * Política de retentativa:
    * { maxAttempts: 3, strategy: 'exponential' | 'fixed', delayMs: 1000, maxDelayMs?: 60000, jitter?: true }
    */
   @Column({ name: "retry_policy", type: "jsonb", nullable: true })
-  retryPolicy?: {
-    maxAttempts?: number;
-    strategy?: 'exponential' | 'fixed';
-    delayMs?: number;
-    maxDelayMs?: number;
-    jitter?: boolean;
-  } | null;
+  retryPolicy?: EndpointRetryPolicy | null;
 
   /**
    * Rate limiting por rota:
    * { limit: 100, intervalMs: 1000, burst?: 50, key?: 'targetSystem' | 'endpoint' | 'custom' }
    */
   @Column({ name: "rate_limit", type: "jsonb", nullable: true })
-  rateLimit?: {
-    strategy?: 'fixed-window' | 'token-bucket';
-    limit?: number;
-    intervalMs?: number;
-    burst?: number;
-  } | null;
+  rateLimit?: EndpointRateLimitConfig | null;
 
   /**
    * Política de circuit breaker opcional por endpoint.
    * { threshold?: number; openMs?: number; halfOpenMaxAttempts?: number }
    */
   @Column({ name: "breaker_policy", type: "jsonb", nullable: true })
-  breakerPolicy?: {
-    threshold?: number;
-    openMs?: number;
-    halfOpenMaxAttempts?: number;
-  } | null;
+  breakerPolicy?: EndpointBreakerPolicy | null;
 
   /**
    * Concorrência máxima local por endpoint nesta instância.
@@ -222,8 +208,10 @@ export class IntegrationEndpoint {
    * Idempotência:
    * { strategy: 'header' | 'bodyHash' | 'custom', headerName?: 'Idempotency-Key', ttlMs?: 300000 }
    */
+  /*
   @Column({ type: "jsonb", nullable: true })
   idempotency?: Record<string, any> | null;
+  */
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
