@@ -40,6 +40,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { AuthType } from '../../../enum/integration.enums.js';
+import { IntegrationCredentialConfig, IntegrationCredentialSecrets } from './integration.interface.js';
 
 
 /**
@@ -76,7 +77,7 @@ export class IntegrationCredential {
    *  - oauth2: { tokenUrl: string, clientId: string, scopes?: string[], audience?: string, resource?: string, authStyle?: 'body'|'basic' }
    */
   @Column({ type: 'jsonb', nullable: true })
-  config?: Record<string, any> | null;
+  config?: IntegrationCredentialConfig | null;
 
   /**
    * Segredos sensíveis (não selecionados por padrão):
@@ -85,8 +86,8 @@ export class IntegrationCredential {
    *  - bearer: { token: string }
    *  - oauth2: { clientSecret: string, username?: string, password?: string, privateKey?: string }
    */
-  @Column({ type: 'jsonb', nullable: true, select: false })
-  secrets?: Record<string, any> | null;
+  @Column({ type: 'jsonb', nullable: true })
+  secrets?: IntegrationCredentialSecrets | null;
 
 
 

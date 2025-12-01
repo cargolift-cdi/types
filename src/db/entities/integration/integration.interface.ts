@@ -56,3 +56,30 @@ export interface EndpointIdempotencyConfig {
   headerName?: string; // ex.: 'Idempotency-Key'
   ttlMs?: number; // tempo de vida da chave de idempotência
 }
+
+export interface IntegrationCredentialConfig {
+  apiKey?: { headerName?: string; queryName?: string; prefix?: string };
+  basic?: { usernameField?: string };
+  bearer?: { headerName?: string; prefix?: string };
+  oauth2?: {
+    tokenUrl: string;
+    clientId: string;
+    scopes?: string[] | string;
+    audience?: string;
+    resource?: string;
+    authStyle?: 'body' | 'basic' | 'bearer';
+  }; 
+}
+
+
+export interface IntegrationCredentialSecrets {
+  apiKey?: { value: string };
+  basic?: { username: string; password: string };
+  bearer?: { token: string };
+  oauth2?: {
+    clientSecret: string;
+    username?: string;
+    password?: string;
+    privateKey?: string;
+  };
+}
