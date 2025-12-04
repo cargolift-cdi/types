@@ -40,7 +40,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { AuthType } from '../../../enum/integration.enums.js';
-import { IntegrationCredentialConfig, IntegrationCredentialSecrets } from './integration.interface.js';
+import { IntegrationCredentialConfig, IntegrationCredentialSecrets } from '../../../interfaces/integration.interface.js';
 
 
 /**

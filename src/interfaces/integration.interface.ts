@@ -1,13 +1,18 @@
-import { HttpMethod } from "../../../enum/integration.enums.js";
+import { HttpMethod } from "../enum/integration.enums.js";
+
+export interface HttpHeader {
+  contentType?: string;     // 'application/json' | 'application/xml' | 'text/plain' | etc
+  [key: string]: string | undefined;
+}
+
+export interface EndpointConfig {
+  timeoutMs?: number;
+}
 
 export interface EndpointHttpConfig {
   method: HttpMethod;
-  pathTemplate?: string; // ex.: /v1/drivers/{{id}}
-  headersTemplate?: Record<string, string>; // valores podem conter templates
-  queryTemplate?: Record<string, any>;
-  bodyTemplate?: any; // JSONata/Liquid/Handlebars
-  contentType?: string; // 'application/json' | 'application/xml' | 'text/plain' | etc
-  timeoutMs?: number;
+  path?: string; // ex.: /v1/drivers
+  header?: HttpHeader,
   compression?: { type?: 'gzip' | 'deflate' | 'br' };
 }
 
@@ -18,9 +23,7 @@ export interface EndpointQueueConfig {
   routingKey?: string;
   partitionKey?: string;
   messageKey?: string;
-  headersTemplate?: Record<string, string>; // valores podem conter templates
   properties?: Record<string, any>; // propriedades específicas do broker
-  payloadTemplate?: any; // JSONata/Liquid/Handlebars
 }
 
 export interface EndpointTlsConfig  {

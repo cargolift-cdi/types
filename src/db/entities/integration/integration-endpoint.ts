@@ -24,48 +24,9 @@
  * - SQS/PubSub: ARN, tópico ou projeto+tópico
  *
  * @property httpConfig Configurações específicas quando transportProtocol é HTTP/REST.
- *   Estrutura típica:
- *   {
- *     method?: 'POST'|'PUT'|'PATCH'|'GET'|'DELETE',
- *     pathTemplate?: string,                // ex.: /v1/drivers/{{id}}
- *     headersTemplate?: Record<string,string>,
- *     queryTemplate?: Record<string,any>,
- *     bodyTemplate?: any,                   // JSONata / Liquid / Handlebars
- *     contentType?: string,                 // ex.: 'application/json'
- *     timeoutMs?: number,
- *     compression?: { type?: 'gzip'|'deflate'|'br' }
- *   }
  *
  * @property queueConfig Configurações para filas/streams quando transportProtocol é AMQP/Kafka/SQS/PubSub.
- *   Estrutura típica:
- *   {
- *     topic?: string,
- *     queue?: string,
- *     exchange?: string,
- *     routingKey?: string,
- *     partitionKey?: string,
- *     messageKey?: string,
- *     headersTemplate?: Record<string,string>,
- *     properties?: Record<string,any>, // propriedades específicas do broker
- *     payloadTemplate?: any
- *   }
  *
- * @example Exemplo de httpConfig:
- * {
- *   method: 'POST',
- *   pathTemplate: '/v1/drivers/{{id}}',
- *   headersTemplate: { 'Authorization': 'Bearer {{token}}', 'Content-Type': 'application/json' },
- *   bodyTemplate: { id: '{{id}}', name: '{{name}}' },
- *   timeoutMs: 5000
- * }
- *
- * @example Exemplo de queueConfig para Kafka:
- * {
- *   topic: 'drivers.created',
- *   partitionKey: '{{id}}',
- *   headersTemplate: { correlationId: '{{correlationId}}' },
- *   payloadTemplate: { id: '{{id}}', payload: '{{payload}}' }
- * }
  */
 import {
   Column,
@@ -75,13 +36,13 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { HttpMethod, TransportProtocol } from "../../../enum/integration.enums.js";
-import { EndpointBreakerPolicy, EndpointHttpConfig, EndpointQueueConfig, EndpointRateLimitConfig, EndpointRetryPolicy, EndpointTlsConfig } from "./integration.interface.js";
+import { TransportProtocol } from "../../../enum/integration.enums.js";
+import { EndpointBreakerPolicy, EndpointConfig, EndpointHttpConfig, EndpointQueueConfig, EndpointRateLimitConfig, EndpointRetryPolicy, EndpointTlsConfig } from "../../../interfaces/integration.interface.js";
 
 
 /**
  * Definição de roteamento de saída por chave (evento) e destino.
- * Agora inclui também as configurações de Target/Delivery (protocolo, endpoint, templates, políticas, etc.).
+ * Agora inclui também as configurações de Target/Delivery (protocolo, endpoint, políticas, etc.).
  */
 @Entity({ name: "integration_endpoint" })
 @Index("uq_integration_endpoint_active", ["system", "event", "action"], {
@@ -142,21 +103,17 @@ export class IntegrationEndpoint {
   @Column({ type: "jsonb", nullable: true })
   tls?: EndpointTlsConfig | null;  
 
+  /**
+   * Configurações gerais do endpoint
+   */
+  @Column({ name: "config", type: "jsonb", nullable: true })
+  config?: EndpointConfig | null;
+
   // @Column({ name: "http_method", type: "varchar", length: 10, default: 'POST', nullable: true })
   // httpMethod!: HttpMethod | null;
 
   /**
-   * Config HTTP específica (quando transport = 'http'):
-   * {
-   *   method: 'POST' | 'PUT' | 'PATCH' | 'GET' | 'DELETE',
-   *   pathTemplate?: string,              // ex.: /v1/drivers/{{id}}
-   *   headersTemplate?: Record<string, string>, // valores podem conter templates
-   *   queryTemplate?: Record<string, any>,
-   *   bodyTemplate?: any,                 // JSONata/Liquid/Handlebars
-   *   contentType?: 'application/json' | 'application/xml' | 'text/plain' | string,
-   *   timeoutMs?: number,
-   *   compression?: { type?: 'gzip' | 'deflate' | 'br' }
-   * }
+   * Config HTTP específica (quando transport = 'REST'):
    */
   @Column({ name: "http_config", type: "jsonb", nullable: true })
   httpConfig?: EndpointHttpConfig | null;
@@ -166,9 +123,7 @@ export class IntegrationEndpoint {
    * {
    *   topic?: string, queue?: string, exchange?: string, routingKey?: string,
    *   partitionKey?: string, messageKey?: string,
-   *   headersTemplate?: Record<string, string>,
    *   properties?: Record<string, any>, // amqp/kafka props
-   *   payloadTemplate?: any
    * }
    */
   @Column({ name: "queue_config", type: "jsonb", nullable: true })

@@ -7,6 +7,7 @@ export * from './interfaces/envelope-message.interface.js';
 export * from './interfaces/context-message.interface.js';
 export * from './interfaces/publish-meta.interface.js';
 export * from './interfaces/api-response.interface.js';
+export * from './interfaces/integration.interface.js';
 
 // Entidades
 export * from './db/entities/integration/integration-system.entity.js';
