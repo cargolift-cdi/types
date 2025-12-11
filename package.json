@@ -1,6 +1,6 @@
 {
   "name": "@cargolift-cdi/types",
-  "version": "0.1.62",
+  "version": "0.1.67",
   "description": "TypeScript types e interfaces comuns para projetos Cargolift CDI",
   "keywords": [
     "typescript",

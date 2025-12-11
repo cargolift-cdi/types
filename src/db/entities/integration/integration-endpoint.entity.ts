@@ -37,7 +37,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { TransportProtocol } from "../../../enum/integration.enums.js";
-import { EndpointBreakerPolicy, EndpointConfig, EndpointHttpConfig, EndpointQueueConfig, EndpointRateLimitConfig, EndpointRetryPolicy, EndpointTlsConfig } from "../../../interfaces/integration.interface.js";
+import { BreakerPolicy, EndpointConfig, EndpointQueueConfig, EndpointTlsConfig, HttpConfig, RateLimit, RetryPolicy } from "../../../interfaces/integration.interface.js";
 
 
 /**
@@ -116,7 +116,7 @@ export class IntegrationEndpoint {
    * Config HTTP específica (quando transport = 'REST'):
    */
   @Column({ name: "http_config", type: "jsonb", nullable: true })
-  httpConfig?: EndpointHttpConfig | null;
+  httpConfig?: HttpConfig | null;
 
   /**
    * Config de fila/stream (quando transport = 'amqp' | 'kafka' | 'sqs' | 'pubsub'):
@@ -129,27 +129,27 @@ export class IntegrationEndpoint {
   @Column({ name: "queue_config", type: "jsonb", nullable: true })
   queueConfig?: EndpointQueueConfig| null;
 
-
+ 
   /**
    * Política de retentativa:
    * { maxAttempts: 3, strategy: 'exponential' | 'fixed', delayMs: 1000, maxDelayMs?: 60000, jitter?: true }
    */
   @Column({ name: "retry_policy", type: "jsonb", nullable: true })
-  retryPolicy?: EndpointRetryPolicy | null;
+  retryPolicy?: RetryPolicy | null;
 
   /**
    * Rate limiting por rota:
    * { limit: 100, intervalMs: 1000, burst?: 50, key?: 'targetSystem' | 'endpoint' | 'custom' }
    */
   @Column({ name: "rate_limit", type: "jsonb", nullable: true })
-  rateLimit?: EndpointRateLimitConfig | null;
+  rateLimit?: RateLimit | null;
 
   /**
    * Política de circuit breaker opcional por endpoint.
    * { threshold?: number; openMs?: number; halfOpenMaxAttempts?: number }
    */
   @Column({ name: "breaker_policy", type: "jsonb", nullable: true })
-  breakerPolicy?: EndpointBreakerPolicy | null;
+  breakerPolicy?: BreakerPolicy | null;
 
   /**
    * Concorrência máxima local por endpoint nesta instância.

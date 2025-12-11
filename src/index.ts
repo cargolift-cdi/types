@@ -13,7 +13,7 @@ export * from './interfaces/integration.interface.js';
 export * from './db/entities/integration/integration-system.entity.js';
 export * from './db/entities/integration/integration-inbound.entity.js';
 export * from './db/entities/integration/integration-outbound.entity.js';
-export * from './db/entities/integration/integration-endpoint.js';
+export * from './db/entities/integration/integration-endpoint.entity.js';
 export * from './db/entities/integration/integration-credential.entity.js';
 
 export * from './db/entities/diagnostic-latency.entity.js';
