@@ -1,15 +1,18 @@
 import { HttpMethod } from "../enum/integration.enums.js";
 
-export interface ResponseTemplateFieldConfig {
+export interface ResponseInterpreterSuccessCondition {
   path: string;
   equals?: string | number | boolean | null;
-  fallback?: string;
 }
 
-export interface HttpResponseTemplate {
-  success?: ResponseTemplateFieldConfig | ResponseTemplateFieldConfig[];
+export interface ResponseInterpreterRules {
+  success?: ResponseInterpreterSuccessCondition | ResponseInterpreterSuccessCondition[];
   message?: string | string[];
   details?: string | string[];
+  options?: {
+    failureOnMissingPath?: boolean; // se true, falha se o path não existir no payload. Default: false
+    retryOnFailure?: boolean;       // se true, indica que a falha deve ser considerada para retry. Default: false
+  }
 }
 
 export interface HttpHeader {
@@ -36,7 +39,7 @@ export interface HttpConfig {
   path?: string; // ex.: /v1/drivers
   header?: HttpHeader;
   queryParams?: Record<string, string>;
-  responseTemplate?: HttpResponseTemplate;
+  responseInterpreter?: ResponseInterpreterRules;
   compression?: { type?: "gzip" | "deflate" | "br" };
 }
 
