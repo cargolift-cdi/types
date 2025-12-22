@@ -11,8 +11,8 @@ export interface ResponseInterpreterRules {
   details?: string | string[];
   options?: {
     failureOnMissingPath?: boolean; // se true, falha se o path não existir no payload. Default: false
-    retryOnFailure?: boolean;       // se true, indica que a falha deve ser considerada para retry. Default: false
-  }
+    retryOnFailure?: boolean; // se true, indica que a falha deve ser considerada para retry. Default: false
+  };
 }
 
 export interface HttpHeader {
@@ -41,6 +41,9 @@ export interface HttpConfig {
   queryParams?: Record<string, string>;
   responseInterpreter?: ResponseInterpreterRules;
   compression?: { type?: "gzip" | "deflate" | "br" };
+  onError?: {
+    retryStatusCodes?: number[]; // ex.: [500, 502, 503, 504]
+  };
 }
 
 export interface EndpointQueueConfig {
@@ -81,9 +84,9 @@ export interface RateLimit {
 }
 
 export interface BreakerPolicy {
-  threshold?: number;
-  openMs?: number;
-  halfOpenMaxAttempts?: number;
+  threshold?: number;           // Quantidade de falhas para abrir o circuito
+  openMs?: number;              // Tempo em ms que o circuito permanece aberto
+  halfOpenMaxAttempts?: number; // Tentativas permitidas no estado half-open
 }
 
 export interface Credential {
