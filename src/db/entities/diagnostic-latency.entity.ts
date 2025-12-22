@@ -10,7 +10,7 @@ export class DiagnosticLatency {
   @PrimaryGeneratedColumn({ type: 'int' })
   id!: number;
 
-  @Column({ type: 'varchar', default: 36 })
+  @Column({ type: 'varchar', length: 36 })
   correlationId!: string;
 
   @Column({ type: 'timestamptz'})

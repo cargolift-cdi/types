@@ -25,6 +25,15 @@ export enum AuthType {
   OAUTH2_PASSWORD = 'OAUTH2_PASSWORD'
 }
 
+export enum IntegrationStatus {
+  PENDING = 'pending',
+  SUCCESS = 'success',
+  FAILED = 'failed',
+  RETRYING = 'retrying',
+  DISCARDED = 'discarded'
+}
+
+
 /*
 export enum ApiKeyIn {
   HEADER = 'HEADER',
