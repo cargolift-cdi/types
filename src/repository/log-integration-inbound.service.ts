@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { LogIntegrationInbound } from '../entities/log/log-integration-inbound.entity.js';
+import { LogIntegrationInbound } from '../entities/log-integration-inbound.entity.js';
 
 /**
  * Repositório de diagnóstico de latência.
@@ -25,16 +25,26 @@ export class LogIntegrationInboundService {
     system: string,
     event: string,
     action: string,
-    correlationId?: string
+    correlationId?: string,
+    data: Partial<LogIntegrationInbound> = {}
   ): Promise<LogIntegrationInbound> {
-
-    const logInbound = this.repo.create({
+    const payload = {
       system,
       event,
       action,
-      correlationId
-    });
+      correlationId,
+      ...data
+    };
 
-    return this.repo.save(logInbound);
+    await this.repo.upsert(payload, ['system', 'event', 'action', 'correlationId']);
+
+    return this.repo.findOne({
+      where: {
+        system,
+        event,
+        action,
+        correlationId
+      }
+    }) as Promise<LogIntegrationInbound>;
   }
 }

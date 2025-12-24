@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { IntegrationStatus, TransportProtocol } from '../../../enum/integration.enums.js';
+import { IntegrationStatus, TransportProtocol } from '../enum/integration.enums.js';
 
 
 /**

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { IntegrationEndpoint } from '../entities/integration/integration-endpoint.entity.js';
-import { IntegrationCredential } from '../entities/integration/integration-credential.entity.js';
+import { IntegrationEndpoint } from '../entities/integration-endpoint.entity.js';
+import { IntegrationCredential } from '../entities/integration-credential.entity.js';
 
 
 @Injectable()

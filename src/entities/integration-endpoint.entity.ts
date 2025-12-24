@@ -36,8 +36,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { TransportProtocol } from "../../../enum/integration.enums.js";
-import { BreakerPolicy, EndpointConfig, EndpointQueueConfig, EndpointTlsConfig, HttpConfig, RateLimit, RetryPolicy } from "../../../interfaces/integration.interface.js";
+import { TransportProtocol } from "../enum/integration.enums.js";
+import { BreakerPolicy, EndpointConfig, EndpointQueueConfig, EndpointTlsConfig, HttpConfig, RateLimit, RetryPolicy } from "../interfaces/integration.interface.js";
 
 
 /**

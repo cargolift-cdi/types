@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { IntegrationOutbound } from "../entities/integration/integration-outbound.entity.js";
+import { IntegrationOutbound } from "../entities/integration-outbound.entity.js";
 
 @Injectable()
 export class OutboundRepositoryService {

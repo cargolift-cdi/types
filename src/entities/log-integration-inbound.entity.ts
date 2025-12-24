@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { IntegrationStatus } from "../../../enum/integration.enums.js";
+import { IntegrationStatus } from "../enum/integration.enums.js";
 
 
 /**
