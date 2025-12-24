@@ -52,7 +52,11 @@ export class LogIntegrationInbound {
 
   /** Duração da última tentativa em milissegundos */
   @Column({ name: "duration_last_ms", type: "int", nullable: true })
-  durationLastMs?: number | null;  
+  durationLastMs?: number | null;
+
+  /** Ação SOAP informada no envelope quando aplicável */
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  soapAction?: string | null;
 
   /** Cabeçalhos enviados ao destino após sanitização */
   @Column({ type: 'text', nullable: true })
@@ -72,38 +76,39 @@ export class LogIntegrationInbound {
 
   /** Payload após enriquecimento de regras do BRE */
   @Column({ type: 'text', nullable: true })
-  enrichmentPayload?: string | null;  
+  enrichmentPayload?: string | null;
 
-  /** Ação SOAP informada no envelope quando aplicável */
-  @Column({ type: 'varchar', length: 120, nullable: true })
-  soapAction?: string | null;
-
-
+  /** Status final do processamento */
   @Column({ type: 'varchar', length: 10, nullable: false })
   status!: IntegrationStatus;
 
+  /** Motivo do status (mensagem curta) */
   @Column({ type: 'varchar', length: 255, nullable: true })
   statusReason?: string | null;
 
-  /** Mensagem de erro já sanitizada para suporte */
+  /** Mensagem completa do erro */
   @Column({ type: 'text', nullable: true })
   errorMessage?: string | null;
 
-  /** Stack completo quando disponível (mantido para investigações profundas) */
+  /** Stack completo quando disponível (mantido para investigações) */
   @Column({ type: 'text', nullable: true })
   errorStack?: string | null;
-  
+
   /** Classificação do erro para o mecanismo de DLQ/retry */
   @Column({ type: 'varchar', length: 20, nullable: true })
-  errorClassification?: 'transient' | 'fatal' | 'business' | 'none';  
+  errorClassification?: 'transient' | 'fatal' | 'business' | 'none';
+
+  /** Indica se este log veio de um replay manual ou DLQ */
+  @Column({ type: 'boolean', default: false })
+  wasReplayedFromDlq!: boolean;  
 
   /** ID da tabela integration_inbound */
   @Column({ type: 'bigint' })
-  inboundId!: string; // manter string no TS para bigint seguro    
+  inboundId!: string; // manter string no TS para bigint seguro
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
   @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
-  updatedAt!: Date;  
+  updatedAt!: Date;
 }

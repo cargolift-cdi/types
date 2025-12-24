@@ -45,10 +45,11 @@ export class IntegrationConnectorLog {
 
   /** Duração da última tentativa em milissegundos */
   @Column({ name: "duration_last_ms", type: "int", nullable: true })
-  durationLastMs?: number | null;    
+  durationLastMs?: number | null;
 
+  /** Transporte de saída: 'REST' | 'SOAP' | 'AMQP' | etc */
   @Column({ name: "transport_protocol", type: "varchar", length: 20 })
-  transportProtocol!: TransportProtocol;  
+  transportProtocol!: TransportProtocol;
 
   /** Método HTTP efetivamente disparado (GET/POST/PUT/...) */
   @Column({ type: 'varchar', length: 10, nullable: true })
@@ -56,7 +57,7 @@ export class IntegrationConnectorLog {
 
   /** Ação SOAP informada no envelope quando aplicável */
   @Column({ type: 'varchar', length: 120, nullable: true })
-  soapAction?: string | null;  
+  soapAction?: string | null;
 
   /** URL final depois de aplicar templates, path params e query string */
   @Column({ type: 'text', nullable: true })
@@ -68,7 +69,7 @@ export class IntegrationConnectorLog {
 
   /** Query string resolvida (após merge com templates) */
   @Column({ type: 'json', nullable: true })
-  requestQuery?: Record<string, unknown> | null;  
+  requestQuery?: Record<string, unknown> | null;
 
   /** Payload enviado na requisição */
   @Column({ type: 'text', nullable: true })
@@ -80,18 +81,15 @@ export class IntegrationConnectorLog {
 
   /** Payload recebido da resposta */
   @Column({ type: 'text' })
-  responsePayload?: string;    
+  responsePayload?: string;
 
-  /** Nome do arquivo sob processamento (quando o conector envia anexo ou lote) */
-  /*@Column({ type: 'varchar', length: 160, nullable: true })
-  fileName?: string | null;*/
-
+  /** Código HTTP retornado pelo destino */
   @Column({ type: 'int', nullable: true })
   httpStatusCode!: number;
 
   /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
   @Column({ type: 'int', nullable: true })
-  attempts!: number;  
+  attempts!: number;
 
   /** Status final da operação */
   @Column({ type: 'varchar', length: 10})
@@ -124,16 +122,17 @@ export class IntegrationConnectorLog {
   @Column({ type: 'json', nullable: true, default: () => "'{}'" })
   metadata?: Record<string, any>;
 
+  /** Identificador do registro outbound associado */
   @Column({ type: 'bigint' })
-  outboundId!: string;  
+  outboundId!: string;
 
+  /** Identificador do endpoint utilizado */
   @Column({ type: 'bigint' })
   endpointId!: string;
-
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
   @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
-  updatedAt!: Date;  
+  updatedAt!: Date;
 }
