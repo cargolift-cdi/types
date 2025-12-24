@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { IntegrationStatus } from '../../../enum/integration.enums.js';
+import { IntegrationStatus, TransportProtocol } from '../../../enum/integration.enums.js';
 
 
 /**
@@ -7,14 +7,14 @@ import { IntegrationStatus } from '../../../enum/integration.enums.js';
  * Armazena informações sobre a latência de operações, incluindo timestamps de início e fim,
  * além do ID de correlação para rastreamento.
  */
-@Entity({ name: 'integration_connector_log' })
+@Entity({ name: 'log_integration_outbound' })
 @Index(["system", "event", "action"])
 @Index(["correlationId"])
 @Index(["status", "updatedAt"])
 @Index(["system", "event", "updatedAt"])
-export class DiagnosticLatency {
-  @PrimaryGeneratedColumn({ type: 'int' })
-  id!: number;
+export class IntegrationConnectorLog {
+  @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
+  id!: string;
 
   /** Sistema de destino (e.g., 'erp', 'wms') */
   @Column({ name: "system", type: "varchar", length: 80 })
@@ -28,70 +28,77 @@ export class DiagnosticLatency {
   @Column({ type: "varchar", length: 40 })
   action!: string;
 
-  @Column({ type: 'varchar', length: 36 })
+  @Column({ name: "correlation_id", type: "varchar", length: 36 })
   correlationId!: string;
 
-  @CreateDateColumn({ name: "created_at", type: "timestamptz" })
-  createdAt!: Date;
+  /** Timestamp de início da requisição */
+  @Column({ name: "timestamp_start", type: "timestamptz" })
+  timestampStart!: Date;
 
-  @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
-  updatedAt!: Date;
+  /** Timestamp do último processamento ou da última tentativa */
+  @Column({ name: "timestamp_last", type: "timestamptz", nullable: true })
+  timestampLast?: Date | null;
 
-  @Column({ type: 'text' })
-  payload!: string;
+  /** Duração total em milissegundos */
+  @Column({ name: "duration_ms", type: "int", nullable: true })
+  durationMs?: number | null;
 
-  @Column({ type: 'text' })
-  response!: string;
+  /** Duração da última tentativa em milissegundos */
+  @Column({ name: "duration_last_ms", type: "int", nullable: true })
+  durationLastMs?: number | null;    
+
+  @Column({ name: "transport_protocol", type: "varchar", length: 20 })
+  transportProtocol!: TransportProtocol;  
 
   /** Método HTTP efetivamente disparado (GET/POST/PUT/...) */
   @Column({ type: 'varchar', length: 10, nullable: true })
   httpMethod?: string | null;
 
+  /** Ação SOAP informada no envelope quando aplicável */
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  soapAction?: string | null;  
+
   /** URL final depois de aplicar templates, path params e query string */
   @Column({ type: 'text', nullable: true })
-  resolvedUrl?: string | null;
+  url?: string | null;
 
   /** Cabeçalhos enviados ao destino após sanitização */
   @Column({ type: 'json', nullable: true })
   requestHeaders?: Record<string, string> | null;
 
+  /** Query string resolvida (após merge com templates) */
+  @Column({ type: 'json', nullable: true })
+  requestQuery?: Record<string, unknown> | null;  
+
+  /** Payload enviado na requisição */
+  @Column({ type: 'text', nullable: true })
+  requestPayload?: string | null;
+
   /** Cabeçalhos recebidos da resposta */
   @Column({ type: 'json', nullable: true })
   responseHeaders?: Record<string, string> | null;
 
-  /** Query string resolvida (após merge com templates) */
-  @Column({ type: 'json', nullable: true })
-  requestQuery?: Record<string, unknown> | null;
-
-  /** Corpo de referência (sem dados sensíveis) usado para montar requests */
-  @Column({ type: 'text', nullable: true })
-  sanitizedBodyTemplate?: string | null;
-
-  /** Ação SOAP informada no envelope quando aplicável */
-  @Column({ type: 'varchar', length: 120, nullable: true })
-  soapAction?: string | null;
+  /** Payload recebido da resposta */
+  @Column({ type: 'text' })
+  responsePayload?: string;    
 
   /** Nome do arquivo sob processamento (quando o conector envia anexo ou lote) */
   /*@Column({ type: 'varchar', length: 160, nullable: true })
   fileName?: string | null;*/
 
-  @Column({ type: 'int', default: 0 })
-  statusCode!: number;
+  @Column({ type: 'int', nullable: true })
+  httpStatusCode!: number;
 
-  @Column({ type: 'int', default: 0 })
-  latencyMs!: number;  
-
-  @Column({ type: 'int', default: 0 })
+  /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
+  @Column({ type: 'int', nullable: true })
   attempts!: number;  
 
+  /** Status final da operação */
   @Column({ type: 'varchar', length: 10})
   status!: IntegrationStatus;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  statusReason!: string;
-
-  @Column({ type: 'bigint' })
-  endpointId!: string;
+  statusReason?: string | null;
 
   /** Categoria do erro técnico observado (ECONNRESET, TIMEOUT etc.) */
   @Column({ type: 'varchar', length: 120, nullable: true })
@@ -105,38 +112,28 @@ export class DiagnosticLatency {
   @Column({ type: 'text', nullable: true })
   errorStack?: string | null;
 
-  /** Código de erro funcional retornado pelo destino ou BRE */
-  @Column({ type: 'varchar', length: 60, nullable: true })
-  businessErrorCode?: string | null;
-
   /** Classificação do erro para o mecanismo de DLQ/retry */
   @Column({ type: 'varchar', length: 20, nullable: true })
   errorClassification?: 'transient' | 'fatal' | 'business' | 'none';
-
-  /** Quantidade de vezes que a mensagem já foi reprocessada */
-  @Column({ type: 'int', nullable: true })
-  retrySequence?: number | null;
-
-  /** Nome da política de retry aplicada (fixed, backoff, jitter etc.) */
-  @Column({ type: 'varchar', length: 40, nullable: true })
-  retryPolicy?: string | null;
-
-  /** Momento em que a última tentativa aconteceu */
-  @Column({ type: 'timestamptz', nullable: true })
-  lastAttemptAt?: Date | null;
-
-  /** Próxima execução agendada quando o item aguarda backoff */
-  @Column({ type: 'timestamptz', nullable: true })
-  retryScheduledFor?: Date | null;
 
   /** Indica se este log veio de um replay manual ou DLQ */
   @Column({ type: 'boolean', default: false })
   wasReplayedFromDlq!: boolean;
 
-  @Column({ type: 'json', nullable: true, default: () => "'{}'" })
-  data?: Record<string, any>;
-
   /** Espaço para dados específicos do conector (OAuth, throttling, etc.) */
   @Column({ type: 'json', nullable: true, default: () => "'{}'" })
   metadata?: Record<string, any>;
+
+  @Column({ type: 'bigint' })
+  outboundId!: string;  
+
+  @Column({ type: 'bigint' })
+  endpointId!: string;
+
+
+  @CreateDateColumn({ name: "created_at", type: "timestamptz" })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
+  updatedAt!: Date;  
 }
