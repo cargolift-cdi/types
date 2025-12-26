@@ -53,13 +53,18 @@ export class InboundRepositoryService {
     const resultMap = new Map<string, IntegrationInbound>();
 
     for (const row of rows) {
-      const key = `${row.system}::${row.event}`;
+      const key = `${row.system}::${row.event}::${row.action}`;
       if (!resultMap.has(key)) {
         resultMap.set(key, row);
       }
     }
 
     return Array.from(resultMap.values());
+  }
+
+  async getFirstActive(system: string, event: string, action: string): Promise<IntegrationInbound | null> {
+    const records = await this.get(system, event, action);
+    return records.length > 0 ? records[0] : null;
   }
 
   /*

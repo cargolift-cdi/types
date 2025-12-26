@@ -10,21 +10,20 @@ export * from './interfaces/api-response.interface.js';
 export * from './interfaces/integration.interface.js';
 
 // Entidades
-export * from './db/entities/integration/integration-system.entity.js';
-export * from './db/entities/integration/integration-inbound.entity.js';
-export * from './db/entities/integration/integration-outbound.entity.js';
-export * from './db/entities/integration/integration-endpoint.entity.js';
-export * from './db/entities/integration/integration-credential.entity.js';
-
-export * from './db/entities/diagnostic-latency.entity.js';
+export * from './entities/integration-system.entity.js';
+export * from './entities/integration-inbound.entity.js';
+export * from './entities/integration-outbound.entity.js';
+export * from './entities/integration-endpoint.entity.js';
+export * from './entities/integration-credential.entity.js';
+export * from './entities/diagnostic-latency.entity.js';
 
 // Enum
 export * from './enum/integration.enums.js';
 export * from './enum/error-type.enum.js';
 
 // Repositórios
-export * from './db/repository/integration-inbound-repository.service.js';
-export * from './db/repository/integration-outbound-repository.service.js';
-export * from './db/repository/integration-endpoint-repository.service.js';
-export * from './db/repository/integration-credential-repository.service.js';
-export * from './db/repository/diagnostic-latency-repository.service.js';
+export * from './repository/integration-inbound-repository.service.js';
+export * from './repository/integration-outbound-repository.service.js';
+export * from './repository/integration-endpoint-repository.service.js';
+export * from './repository/integration-credential-repository.service.js';
+export * from './repository/diagnostic-latency-repository.service.js';

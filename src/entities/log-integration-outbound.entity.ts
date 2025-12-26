@@ -47,6 +47,13 @@ export class IntegrationConnectorLog {
   @Column({ name: "duration_last_ms", type: "int", nullable: true })
   durationLastMs?: number | null;
 
+  /** Status final da operação */
+  @Column({ type: 'varchar', length: 10})
+  status!: IntegrationStatus;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  statusReason?: string | null;  
+
   /** Transporte de saída: 'REST' | 'SOAP' | 'AMQP' | etc */
   @Column({ name: "transport_protocol", type: "varchar", length: 20 })
   transportProtocol!: TransportProtocol;
@@ -89,14 +96,7 @@ export class IntegrationConnectorLog {
 
   /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
   @Column({ type: 'int', nullable: true })
-  attempts!: number;
-
-  /** Status final da operação */
-  @Column({ type: 'varchar', length: 10})
-  status!: IntegrationStatus;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  statusReason?: string | null;
+  retries?: number | null;
 
   /** Categoria do erro técnico observado (ECONNRESET, TIMEOUT etc.) */
   @Column({ type: 'varchar', length: 120, nullable: true })
