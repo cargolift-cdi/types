@@ -1,3 +1,6 @@
+import { LogIntegrationInbound } from "../entities/log-integration-inbound.entity.js";
+import { LogIntegrationOutbound } from "../entities/log-integration-outbound.entity.js";
+
 export interface ContextApplication {
     name: string;
     function?: string;
@@ -38,6 +41,8 @@ export interface ContextMessage {
     source: ContextSource;
     trace?: ContextTrace[];
     error?: ContextError;
+    inbound?: LogIntegrationInbound;
+    outbound?: LogIntegrationOutbound;
 }
 
 export type ContextErrorType = 'business' | 'application' | 'none';

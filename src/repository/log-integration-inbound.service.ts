@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LogIntegrationInbound } from '../entities/log-integration-inbound.entity.js';
+import { IntegrationStatus } from '../enum/integration.enums.js';
 
 /**
  * Repositório de diagnóstico de latência.
  * Responsável por criar/atualizar registros de latência associados a um id.
  */
 @Injectable()
-export class LogIntegrationInboundService {
+export class LogInboundRepositoryService {
   constructor(
     @InjectRepository(LogIntegrationInbound)
     private readonly repo: Repository<LogIntegrationInbound>
@@ -25,26 +26,31 @@ export class LogIntegrationInboundService {
     system: string,
     event: string,
     action: string,
-    correlationId?: string,
+    correlationId: string,
     data: Partial<LogIntegrationInbound> = {}
-  ): Promise<LogIntegrationInbound> {
+  ): Promise<LogIntegrationInbound | null> {
     const payload = {
       system,
       event,
       action,
       correlationId,
+      timestampLast: new Date(),
       ...data
     };
 
-    await this.repo.upsert(payload, ['system', 'event', 'action', 'correlationId']);
+    if (data.status === IntegrationStatus.SUCCESS && payload.timestampStart) {
+      const startTime = new Date(payload.timestampStart).getTime();
+      const endTime = Date.now();
+      payload.durationMs = endTime - startTime;
+    }
+
+    await this.repo.upsert(payload, ['correlationId']);
 
     return this.repo.findOne({
       where: {
-        system,
-        event,
-        action,
         correlationId
       }
-    }) as Promise<LogIntegrationInbound>;
+    });
   }
+
 }

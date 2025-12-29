@@ -12,7 +12,7 @@ import { IntegrationStatus, TransportProtocol } from '../enum/integration.enums.
 @Index(["correlationId"])
 @Index(["status", "updatedAt"])
 @Index(["system", "event", "updatedAt"])
-export class IntegrationConnectorLog {
+export class LogIntegrationOutbound {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string;
 
