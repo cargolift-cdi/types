@@ -38,21 +38,29 @@ export class LogIntegrationInbound {
   @Column({ name: "correlation_id", type: "varchar", length: 36 })
   correlationId!: string;
 
-  /** Timestamp de início da requisição */
+  /** Timestamp de início da requisição na API */
   @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
   timestampStart?: Date | string;
+  
+  /** Timestamp do início do processamento no ESB */
+  @Column({ name: "timestamp_process", type: "timestamptz", nullable: true })
+  timestampProcess?: Date | null;  
 
-  /** Timestamp do último processamento ou da última tentativa */
-  @Column({ name: "timestamp_last", type: "timestamptz", nullable: true })
-  timestampLast?: Date | null;
+  /** Timestamp final do processamento no ESB */
+  @Column({ name: "timestamp_end", type: "timestamptz", nullable: true })
+  timestampEnd?: Date | null;
+
+  /** Duração total em milissegundos */
+  @Column({ name: "duration_request_ms", type: "int", nullable: true })
+  durationRequest?: number | null;  
+
+  /** Duração do processamento em milissegundos no ESB */
+  @Column({ name: "duration_process_ms", type: "int", nullable: true })
+  durationProcessMs?: number | null;
 
   /** Duração total em milissegundos */
   @Column({ name: "duration_ms", type: "int", nullable: true })
-  durationMs?: number | null;
-
-  /** Duração da última tentativa em milissegundos */
-  @Column({ name: "duration_last_ms", type: "int", nullable: true })
-  durationLastMs?: number | null;
+  durationMs?: number | null;  
 
   /** Status final do processamento */
   @Column({ type: 'varchar', length: 10, nullable: false })
@@ -61,10 +69,6 @@ export class LogIntegrationInbound {
   /** Motivo do status (mensagem curta) */
   @Column({ type: 'varchar', length: 255, nullable: true })
   statusReason?: string | null;
-
-  /** Ação SOAP informada no envelope quando aplicável */
-  @Column({ type: 'varchar', length: 120, nullable: true })
-  soapAction?: string | null;  
 
   /** Cabeçalhos enviados ao destino após sanitização */
   @Column({ type: 'text', nullable: true })

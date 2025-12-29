@@ -7,7 +7,7 @@ import { ContextSource, ContextError } from "./context-message.interface.js";
 export interface EnvelopeMessage {
   correlation_id?: string;
   eventType?: string;                     // Tipo do evento (ex: 'integration.erp.driver')
-  system: string;                          // Sistema de integração (e.g., 'erp', 'tms')
+  system?: string;                          // Sistema de integração (e.g., 'erp', 'tms')
   event?: string;                         // Nome do recurso que está sendo transacionado: driver, trip, cte, nfse
   action?: string;                        // Ação realizada: CREATE, UPDATE, DELETE, GET
   method?: string;                        // ex: 'CREATE', 'UPDATE', 'DELETE', 'GET'

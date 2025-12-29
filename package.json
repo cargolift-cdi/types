@@ -1,6 +1,6 @@
 {
   "name": "@cargolift-cdi/types",
-  "version": "0.1.75",
+  "version": "0.1.78",
   "description": "TypeScript types e interfaces comuns para projetos Cargolift CDI",
   "keywords": [
     "typescript",
@@ -39,7 +39,7 @@
   "scripts": {
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "build": "npm run clean && tsc -p tsconfig.json",
-    "prepublishOnly": "npm run clean && npm run build"
+    "prepublishOnly": "npm run clean && npm run build && npm version patch --no-git-tag-version"
   },
   "engines": {
     "node": ">=18"
