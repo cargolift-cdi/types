@@ -70,6 +70,10 @@ export class LogIntegrationInbound {
   @Column({ type: 'varchar', length: 255, nullable: true })
   statusReason?: string | null;
 
+  /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
+  @Column({ type: 'int', nullable: true })
+  retries?: number | null;  
+
   /** Cabeçalhos enviados ao destino após sanitização */
   @Column({ type: 'text', nullable: true })
   headers?: string | null;
@@ -90,10 +94,6 @@ export class LogIntegrationInbound {
   @Column({ type: 'text', nullable: true })
   enrichedPayload?: string | null;
 
-  /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
-  @Column({ type: 'int', nullable: true })
-  retries?: number | null;
-
   /** Mensagem completa do erro */
   @Column({ type: 'text', nullable: true })
   errorMessage?: string | null;
@@ -103,8 +103,8 @@ export class LogIntegrationInbound {
   errorStack?: string | null;
 
   /** Classificação do erro para o mecanismo de DLQ/retry */
-  @Column({ type: 'varchar', length: 20, nullable: true })
-  errorClassification?: 'transient' | 'fatal' | 'business' | 'none';
+  @Column({ type: 'varchar', length: 11, nullable: true })
+  errorClassification?: 'application' | 'business';
 
   /** Indica se este log veio de um replay manual ou DLQ */
   @Column({ type: 'boolean', default: false })

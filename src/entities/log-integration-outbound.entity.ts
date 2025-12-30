@@ -1,20 +1,27 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { IntegrationStatus, TransportProtocol } from '../enum/integration.enums.js';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { IntegrationStatus } from "../enum/integration.enums.js";
 
 
 /**
- * Entidade de diagnóstico de latência.
- * Armazena informações sobre a latência de operações, incluindo timestamps de início e fim,
- * além do ID de correlação para rastreamento.
+ * Mantém o histórico de chamadas de integração de entrada (inbound).
+ * Armazena o request e response para auditoria e troubleshooting.
  */
-@Entity({ name: 'log_integration_outbound' })
+@Entity({ name: "log_integration_inbound" })
+@Index(["id"], { unique: true })
+@Index(["correlationId"], { unique: true })
 @Index(["system", "event", "action"])
-@Index(["correlationId"])
 @Index(["status", "updatedAt"])
 @Index(["system", "event", "updatedAt"])
 export class LogIntegrationOutbound {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
-  id!: string;
+  id!: string; // manter string no TS para bigint seguro
 
   /** Sistema de destino (e.g., 'erp', 'wms') */
   @Column({ name: "system", type: "varchar", length: 80 })
@@ -28,107 +35,85 @@ export class LogIntegrationOutbound {
   @Column({ type: "varchar", length: 40 })
   action!: string;
 
+  /** Correlation Id */
   @Column({ name: "correlation_id", type: "varchar", length: 36 })
   correlationId!: string;
 
-  /** Timestamp de início da requisição */
-  @Column({ name: "timestamp_start", type: "timestamptz" })
-  timestampStart!: Date;
+  /** Timestamp de início da requisição na API */
+  @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
+  timestampStart?: Date | string;
+  
+  /** Timestamp do início do processamento no ESB */
+  @Column({ name: "timestamp_process", type: "timestamptz", nullable: true })
+  timestampProcess?: Date | null;  
 
-  /** Timestamp do último processamento ou da última tentativa */
-  @Column({ name: "timestamp_last", type: "timestamptz", nullable: true })
-  timestampLast?: Date | null;
+  /** Timestamp final do processamento no ESB */
+  @Column({ name: "timestamp_end", type: "timestamptz", nullable: true })
+  timestampEnd?: Date | null;
+
+  /** Duração total em milissegundos */
+  @Column({ name: "duration_request_ms", type: "int", nullable: true })
+  durationRequest?: number | null;  
+
+  /** Duração do processamento em milissegundos no ESB */
+  @Column({ name: "duration_process_ms", type: "int", nullable: true })
+  durationProcessMs?: number | null;
 
   /** Duração total em milissegundos */
   @Column({ name: "duration_ms", type: "int", nullable: true })
-  durationMs?: number | null;
+  durationMs?: number | null;  
 
-  /** Duração da última tentativa em milissegundos */
-  @Column({ name: "duration_last_ms", type: "int", nullable: true })
-  durationLastMs?: number | null;
-
-  /** Status final da operação */
-  @Column({ type: 'varchar', length: 10})
+  /** Status final do processamento */
+  @Column({ type: 'varchar', length: 10, nullable: false })
   status!: IntegrationStatus;
 
+  /** Motivo do status (mensagem curta) */
   @Column({ type: 'varchar', length: 255, nullable: true })
-  statusReason?: string | null;  
-
-  /** Transporte de saída: 'REST' | 'SOAP' | 'AMQP' | etc */
-  @Column({ name: "transport_protocol", type: "varchar", length: 20 })
-  transportProtocol!: TransportProtocol;
-
-  /** Método HTTP efetivamente disparado (GET/POST/PUT/...) */
-  @Column({ type: 'varchar', length: 10, nullable: true })
-  httpMethod?: string | null;
-
-  /** Ação SOAP informada no envelope quando aplicável */
-  @Column({ type: 'varchar', length: 120, nullable: true })
-  soapAction?: string | null;
-
-  /** URL final depois de aplicar templates, path params e query string */
-  @Column({ type: 'text', nullable: true })
-  url?: string | null;
-
-  /** Cabeçalhos enviados ao destino após sanitização */
-  @Column({ type: 'json', nullable: true })
-  requestHeaders?: Record<string, string> | null;
-
-  /** Query string resolvida (após merge com templates) */
-  @Column({ type: 'json', nullable: true })
-  requestQuery?: Record<string, unknown> | null;
-
-  /** Payload enviado na requisição */
-  @Column({ type: 'text', nullable: true })
-  requestPayload?: string | null;
-
-  /** Cabeçalhos recebidos da resposta */
-  @Column({ type: 'json', nullable: true })
-  responseHeaders?: Record<string, string> | null;
-
-  /** Payload recebido da resposta */
-  @Column({ type: 'text' })
-  responsePayload?: string;
-
-  /** Código HTTP retornado pelo destino */
-  @Column({ type: 'int', nullable: true })
-  httpStatusCode!: number;
+  statusReason?: string | null;
 
   /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
   @Column({ type: 'int', nullable: true })
-  retries?: number | null;
+  retries?: number | null;  
 
-  /** Categoria do erro técnico observado (ECONNRESET, TIMEOUT etc.) */
-  @Column({ type: 'varchar', length: 120, nullable: true })
-  errorType?: string | null;
+  /** Cabeçalhos enviados ao destino após sanitização */
+  @Column({ type: 'text', nullable: true })
+  headers?: string | null;
 
-  /** Mensagem de erro já sanitizada para suporte */
+  /** Envelope da requisição */
+  @Column({ type: 'text', nullable: true })
+  envelope?: string | null;
+
+  /** Corpo sanitizado da requisição sem o envelope */
+  @Column({ type: 'text', nullable: true })
+  payload?: string | null;
+
+  /** Payload transformado em formato canônico após aplicação da transformação JSONata */
+  @Column({ type: 'text', nullable: true })
+  transformedPayload?: string | null;
+
+  /** Payload após enriquecimento de regras do BRE */
+  @Column({ type: 'text', nullable: true })
+  enrichedPayload?: string | null;
+
+  /** Mensagem completa do erro */
   @Column({ type: 'text', nullable: true })
   errorMessage?: string | null;
 
-  /** Stack completo quando disponível (mantido para investigações profundas) */
+  /** Stack completo quando disponível (mantido para investigações) */
   @Column({ type: 'text', nullable: true })
   errorStack?: string | null;
 
   /** Classificação do erro para o mecanismo de DLQ/retry */
-  @Column({ type: 'varchar', length: 20, nullable: true })
-  errorClassification?: 'transient' | 'fatal' | 'business' | 'none';
+  @Column({ type: 'varchar', length: 11, nullable: true })
+  errorClassification?: 'application' | 'business' | 'business_fatal' | 'application_fatal' | null;
 
   /** Indica se este log veio de um replay manual ou DLQ */
-  @Column({ type: 'boolean', default: false })
-  wasReplayedFromDlq!: boolean;
+  // @Column({ type: 'boolean', default: false })
+  // wasReplayedFromDlq!: boolean;  
 
-  /** Espaço para dados específicos do conector (OAuth, throttling, etc.) */
-  @Column({ type: 'json', nullable: true, default: () => "'{}'" })
-  metadata?: Record<string, any>;
-
-  /** Identificador do registro outbound associado */
-  @Column({ type: 'bigint' })
-  outboundId!: string;
-
-  /** Identificador do endpoint utilizado */
-  @Column({ type: 'bigint' })
-  endpointId!: string;
+  /** ID da tabela integration_inbound */
+  @Column({ type: 'bigint', nullable: true  })
+  inboundId!: string; // manter string no TS para bigint seguro
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
