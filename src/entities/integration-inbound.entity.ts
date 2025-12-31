@@ -1,4 +1,3 @@
-
 /**
  * Representa uma rota de integração de entrada (inbound) que descreve como eventos externos
  * devem ser validados, transformados e aplicados às regras globais antes do roteamento interno.
@@ -11,15 +10,7 @@
  *
 
  */
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from "typeorm";
-
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 /**
  * Eventos de integração (tms.driver) - Ocorre na integração de entrada (inbound) antes do roteamento.
@@ -32,7 +23,6 @@ import {
   unique: true,
   where: `"active" = true`,
 })
-
 export class IntegrationInbound {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
@@ -45,13 +35,13 @@ export class IntegrationInbound {
   @Column({ type: "varchar", length: 80 })
   event!: string;
 
-    /** Ação (e.g., 'create', 'update', 'delete', etc */
+  /** Ação (e.g., 'create', 'update', 'delete', etc */
   @Column({ type: "varchar", length: 40 })
   action!: string;
 
   /** Versão da rota. Apenas a última versão pode estar ativa. Versões anteriores não podem sofrer modificações */
   @Column({ type: "int", default: 1 })
-  version!: number;  
+  version!: number;
 
   /**Se a rota está ativa */
   @Column({ type: "boolean", default: true })
@@ -70,17 +60,28 @@ export class IntegrationInbound {
   transformation?: string | null;
 
   /** Regra global (BRE RulesConfiguration) */
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: "jsonb", nullable: true })
   rules?: Record<string, any> | null;
 
+  // Expressão JSONNata para extração da referência externa (código do cadastro, número do documento, etc) a partir do payload canônico (transformado)
+  @Column({ type: 'text', nullable: true })
+  refExtraction?: string | null;
+
+  // Nome do tipo de referência externa (e.g., 'cte', 'cnpj', 'viagem', etc)
+  @Column({ type: 'varchar', nullable: true })
+  refType?: string | null;  
+
+  // Expressão JSONNata para extração de referências adicionais (e.g., múltiplos códigos relacionados em formato Json) a partir do payload canônico (transformado)
+  @Column({ type: 'text', nullable: true })
+  additionalRefsExtraction?: string | null;
+  
   /** Opções adicionais (reservado para uso futuro) */
-  @Column({ type: "jsonb", nullable: true })
-  options?: Record<string, any> | null;
+  // @Column({ type: "jsonb", nullable: true })
+  // options?: Record<string, any> | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
   @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
   updatedAt!: Date;
-
 }

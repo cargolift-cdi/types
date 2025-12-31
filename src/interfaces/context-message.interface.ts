@@ -41,6 +41,7 @@ export interface ContextMessage {
     source: ContextSource;
     trace?: ContextTrace[];
     error?: ContextError;
+    warns?: string[];
     inbound?: LogIntegrationInbound;
     outbound?: LogIntegrationOutbound;
 }

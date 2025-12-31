@@ -14,6 +14,7 @@ import { IntegrationStatus } from "../enum/integration.enums.js";
  * Armazena o request e response para auditoria e troubleshooting.
  */
 @Entity({ name: "log_integration_inbound" })
+@Index(["id"], { unique: true })
 @Index(["correlationId"], { unique: true })
 @Index(["system", "event", "action"])
 @Index(["status", "updatedAt"])
@@ -38,6 +39,14 @@ export class LogIntegrationInbound {
   @Column({ name: "correlation_id", type: "varchar", length: 36 })
   correlationId!: string;
 
+  /** Status final do processamento */
+  @Column({ type: 'varchar', length: 10, nullable: false })
+  status!: IntegrationStatus;
+
+  /** Motivo do status (mensagem curta) */
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  statusReason?: string | null;  
+
   /** Timestamp de início da requisição na API */
   @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
   timestampStart?: Date | string;
@@ -61,14 +70,6 @@ export class LogIntegrationInbound {
   /** Duração total em milissegundos */
   @Column({ name: "duration_ms", type: "int", nullable: true })
   durationMs?: number | null;  
-
-  /** Status final do processamento */
-  @Column({ type: 'varchar', length: 10, nullable: false })
-  status!: IntegrationStatus;
-
-  /** Motivo do status (mensagem curta) */
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  statusReason?: string | null;
 
   /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
   @Column({ type: 'int', nullable: true })
@@ -103,12 +104,29 @@ export class LogIntegrationInbound {
   errorStack?: string | null;
 
   /** Classificação do erro para o mecanismo de DLQ/retry */
-  @Column({ type: 'varchar', length: 11, nullable: true })
-  errorClassification?: 'application' | 'business';
+  @Column({ type: 'varchar', length: 17, nullable: true })
+  errorClassification?: 'application' | 'business' | 'business_fatal' | 'application_fatal' | null;
+
+  /** Mensagens de avisos e alertas não críticas */
+  @Column({ type: 'text', nullable: true })
+  warns?: string | null;
 
   /** Indica se este log veio de um replay manual ou DLQ */
-  @Column({ type: 'boolean', default: false })
-  wasReplayedFromDlq!: boolean;  
+  // @Column({ type: 'boolean', default: false })
+  // wasReplayedFromDlq!: boolean;  
+
+  // Referência externa associada (código do cadastro, número do documento, etc)
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  integrationRef?: string | null;
+
+  // Tipo da referência externa ('cpf', 'número do cte', etc)
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  integrationRefType?: string | null;
+
+  // Campos para múltiplas referências externas
+  // TODO: Criar migration para índice GIN
+  @Column({ type: 'jsonb', nullable: true })
+  integrationAdditionalRefs?: Record<string, any> | null;
 
   /** ID da tabela integration_inbound */
   @Column({ type: 'bigint', nullable: true  })
