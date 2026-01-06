@@ -13,6 +13,16 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { PayloadConditions } from "../interfaces/payload-condition.interface.js";
 
+interface IntegrationInboundRoutingEvent {
+  event: string;
+  condition: PayloadConditions;
+}
+
+interface IntegrationInboundRoutingAction {
+  action: string;
+  condition: PayloadConditions;
+}
+
 /**
  * Eventos de integração (tms.driver) - Ocorre na integração de entrada (inbound) antes do roteamento.
  * Define expressões JSONata para transformar mensagens de eventos externos em formato JSON canônico interno.
@@ -41,26 +51,16 @@ export class IntegrationInbound {
   action!: string;
 
   /** Condições de roteamento de ações (action) baseadas no payload de canônico 
-   * Direciona a integração para diferentes fluxos. Ex: 'driver' para 'people'
+   * Direciona a integração para diferentes eventos de outbound (saída). Ex: 'driver' para 'people'
   */
   @Column({ type: "jsonb", nullable: true })
-  routingEvent?: [
-    {
-      event: string;
-      condition: PayloadConditions
-    }
-  ];
+  routingOutboundEvent?: IntegrationInboundRoutingEvent[];
 
  /** Condições de definição para ações (action) baseadas no payload canônico 
-   * Direciona a integração para diferentes fluxos. Ex: 'POST' para 'CREATE', 'PUT' para 'UPDATE'
+   * Direciona a integração para diferentes ações de outbound (saída). Ex: 'POST' para 'CREATE', 'PUT' para 'UPDATE'
   */
   @Column({ type: "jsonb", nullable: true })
-  routingAction?: [
-    {
-      action: string;
-      condition: PayloadConditions
-    }
-  ];  
+  routingOutboundAction?: IntegrationInboundRoutingAction[];
 
   /** Versão da rota. Apenas a última versão pode estar ativa. Versões anteriores não podem sofrer modificações */
   @Column({ type: "int", default: 1 })
