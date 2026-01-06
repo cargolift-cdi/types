@@ -11,6 +11,7 @@
 
  */
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { PayloadConditions } from "../interfaces/payload-condition.interface.js";
 
 /**
  * Eventos de integração (tms.driver) - Ocorre na integração de entrada (inbound) antes do roteamento.
@@ -39,6 +40,28 @@ export class IntegrationInbound {
   @Column({ type: "varchar", length: 40 })
   action!: string;
 
+  /** Condições de roteamento de ações (action) baseadas no payload de canônico 
+   * Direciona a integração para diferentes fluxos. Ex: 'driver' para 'people'
+  */
+  @Column({ type: "jsonb", nullable: true })
+  routingEvent?: [
+    {
+      event: string;
+      condition: PayloadConditions
+    }
+  ];
+
+ /** Condições de definição para ações (action) baseadas no payload canônico 
+   * Direciona a integração para diferentes fluxos. Ex: 'POST' para 'CREATE', 'PUT' para 'UPDATE'
+  */
+  @Column({ type: "jsonb", nullable: true })
+  routingAction?: [
+    {
+      action: string;
+      condition: PayloadConditions
+    }
+  ];  
+
   /** Versão da rota. Apenas a última versão pode estar ativa. Versões anteriores não podem sofrer modificações */
   @Column({ type: "int", default: 1 })
   version!: number;
@@ -51,15 +74,15 @@ export class IntegrationInbound {
   @Column({ type: "varchar", length: 500, nullable: true })
   description?: string | null;
 
-  /** Pré-validação do payload de origem  */
+  /** Pré-validação do payload de origem, antes da transformação para o formato canônico */
   @Column({ type: "jsonb", nullable: true })
   validation?: Record<string, any> | null;
 
-  /** Expressão JSONata  */
+  /** Expressão JSONata para transformação do payload de entrada para o formato canônico */
   @Column({ type: "text", nullable: true })
   transformation?: string | null;
 
-  /** Regra global (BRE RulesConfiguration) */
+  /** Regra global (BRE RulesConfiguration) aplicada após a transformação do payload canônico */
   @Column({ type: "jsonb", nullable: true })
   rules?: Record<string, any> | null;
 

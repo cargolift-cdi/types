@@ -114,3 +114,9 @@ export interface CredentialSecrets {
     privateKey?: string;
   };
 }
+
+
+export interface RoutingEvent {
+  field: string;
+  value: string | number | boolean;
+}
