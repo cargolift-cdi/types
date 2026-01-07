@@ -35,6 +35,14 @@ export class LogIntegrationInbound {
   @Column({ type: "varchar", length: 40 })
   action!: string;
 
+  /** Evento de origem (antes do roteamento) (e.g., 'driver' or 'driver.created') */
+  @Column({ type: "varchar", length: 80 })
+  sourceEvent!: string;
+
+  /** Ação de origem (antes do roteamento) (e.g., 'create', 'update', 'delete', etc) */
+  @Column({ type: "varchar", length: 40 })
+  sourceAction!: string;  
+
   /** Correlation Id */
   @Column({ name: "correlation_id", type: "varchar", length: 36 })
   correlationId!: string;

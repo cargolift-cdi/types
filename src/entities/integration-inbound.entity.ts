@@ -15,12 +15,15 @@ import { PayloadConditions } from "../interfaces/payload-condition.interface.js"
 
 interface IntegrationInboundRoutingEvent {
   event: string;
-  condition: PayloadConditions;
+  conditions?: PayloadConditions;
+  default?: boolean;
+  onError?: 'ignore' | 'fail';
 }
 
 interface IntegrationInboundRoutingAction {
   action: string;
-  condition: PayloadConditions;
+  conditions?: PayloadConditions;
+  default?: boolean;
 }
 
 /**

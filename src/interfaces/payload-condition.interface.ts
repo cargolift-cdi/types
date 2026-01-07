@@ -44,5 +44,5 @@ export type { Operator, ConditionBase, AllCondition, AnyCondition, Condition, Pa
 export interface PayloadConditionResult {
   success: boolean; // true se todas as condições forem atendidas
   error?: string; // mensagem de erro em caso de falha
-  errorType?: ErrorType; // tipo de erro
+  errorType?: ErrorType | null; // tipo de erro
 }
