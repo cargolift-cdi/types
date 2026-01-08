@@ -11,19 +11,20 @@
 
  */
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { PayloadConditions } from "../interfaces/payload-condition.interface.js";
+import { PayloadConditionsValue } from "../interfaces/payload-condition.interface.js";
 
 interface IntegrationInboundRoutingEvent {
   event: string;
-  conditions?: PayloadConditions;
+  conditions?: PayloadConditionsValue;
   default?: boolean;
   onError?: 'ignore' | 'fail';
 }
 
 interface IntegrationInboundRoutingAction {
   action: string;
-  conditions?: PayloadConditions;
+  conditions?: PayloadConditionsValue;
   default?: boolean;
+  onError?: 'ignore' | 'fail';
 }
 
 /**

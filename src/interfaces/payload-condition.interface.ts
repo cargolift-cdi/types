@@ -35,11 +35,13 @@ interface AnyCondition {
 
 type Condition = ConditionBase | AllCondition | AnyCondition;
 
+type PayloadConditionsValue = Condition | Condition[];
+
 interface PayloadConditions {
-  conditions: Condition | Condition[];
+  conditions: PayloadConditionsValue;
 }
 
-export type { Operator, ConditionBase, AllCondition, AnyCondition, Condition, PayloadConditions };
+export type { Operator, ConditionBase, AllCondition, AnyCondition, Condition, PayloadConditions, PayloadConditionsValue };
 
 export interface PayloadConditionResult {
   success: boolean; // true se todas as condições forem atendidas

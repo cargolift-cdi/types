@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { IntegrationStatus } from "../enum/integration.enums.js";
+import { ErrorClassification } from "../enum/error-type.enum.js";
 
 
 /**
@@ -36,12 +37,12 @@ export class LogIntegrationInbound {
   action!: string;
 
   /** Evento de origem (antes do roteamento) (e.g., 'driver' or 'driver.created') */
-  @Column({ type: "varchar", length: 80 })
-  sourceEvent!: string;
+  @Column({ type: "varchar", length: 80, nullable: true })
+  sourceEvent?: string | null;
 
   /** Ação de origem (antes do roteamento) (e.g., 'create', 'update', 'delete', etc) */
-  @Column({ type: "varchar", length: 40 })
-  sourceAction!: string;  
+  @Column({ type: "varchar", length: 40, nullable: true })
+  sourceAction?: string | null;  
 
   /** Correlation Id */
   @Column({ name: "correlation_id", type: "varchar", length: 36 })
@@ -83,13 +84,18 @@ export class LogIntegrationInbound {
   @Column({ type: 'int', nullable: true })
   retries?: number | null;  
 
-  /** Cabeçalhos enviados ao destino após sanitização */
+  /** Cabeçalhos do message broker (RabbitMQ) */
   @Column({ type: 'text', nullable: true })
   headers?: string | null;
+
+  /** Corpo bruto da requisição recebido */
+  @Column({ type: 'text', nullable: true })
+  rawPayload?: string | null;    
 
   /** Envelope da requisição */
   @Column({ type: 'text', nullable: true })
   envelope?: string | null;
+
 
   /** Corpo sanitizado da requisição sem o envelope */
   @Column({ type: 'text', nullable: true })
@@ -113,7 +119,7 @@ export class LogIntegrationInbound {
 
   /** Classificação do erro para o mecanismo de DLQ/retry */
   @Column({ type: 'varchar', length: 17, nullable: true })
-  errorClassification?: 'application' | 'business' | 'business_fatal' | 'application_fatal' | null;
+  errorClassification?: ErrorClassification | null;
 
   /** Mensagens de avisos e alertas não críticas */
   @Column({ type: 'text', nullable: true })

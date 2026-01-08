@@ -5,8 +5,9 @@ import { LogIntegrationInbound } from '../entities/log-integration-inbound.entit
 import { IntegrationStatus } from '../enum/integration.enums.js';
 
 /**
- * Repositório de diagnóstico de latência.
+ * Repositório de log de integração de entrada (inbound).
  * Responsável por criar/atualizar registros de latência associados a um id.
+ * Possibilidade de reprocessamento e auditoria.
  */
 @Injectable()
 export class LogInboundRepositoryService {
@@ -17,40 +18,35 @@ export class LogInboundRepositoryService {
 
   /**
    * Cria um novo registro de latência.
-   * @param id 
-   * @param correlation_id 
-   * @param timestamp_start 
-   * @returns 
+   * @param id
+   * @param correlation_id
+   * @param timestamp_start
+   * @returns
    */
-  async register(
-    system: string,
-    event: string,
-    action: string,
-    correlationId: string,
-    data: Partial<LogIntegrationInbound> = {}
-  ): Promise<LogIntegrationInbound | null> {
+  async register(correlationId: string, data: Partial<LogIntegrationInbound> = {}): Promise<LogIntegrationInbound | null> {
     const payload = {
-      system,
-      event,
-      action,
       correlationId,
-      timestampLast: new Date(),
-      ...data
+      durationProcessMs: data.timestampProcess
+        ? Date.now() - new Date(data.timestampProcess || "").getTime()
+        : undefined,
+      ...data,
     };
 
-    if (data.status === IntegrationStatus.SUCCESS && payload.timestampStart) {
-      const startTime = new Date(payload.timestampStart).getTime();
+    if (data.status === IntegrationStatus.SUCCESS || data.status === IntegrationStatus.FAILED) {
       const endTime = Date.now();
-      payload.durationMs = endTime - startTime;
+
+      payload.timestampEnd = new Date();
+      if (payload.timestampStart) {
+        payload.durationMs = endTime - new Date(payload.timestampStart).getTime();
+      }
     }
 
-    await this.repo.upsert(payload, ['correlationId']);
+    await this.repo.upsert(payload, ["correlationId"]);
 
     return this.repo.findOne({
       where: {
-        correlationId
-      }
+        correlationId,
+      },
     });
   }
-
 }
