@@ -11,21 +11,8 @@
 
  */
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { PayloadConditionsValue } from "../interfaces/payload-condition.interface.js";
+import { IntegrationInboundRouting } from "../interfaces/integration.interface.js";
 
-interface IntegrationInboundRoutingEvent {
-  event: string;
-  conditions?: PayloadConditionsValue;
-  default?: boolean;
-  onError?: 'ignore' | 'fail';
-}
-
-interface IntegrationInboundRoutingAction {
-  action: string;
-  conditions?: PayloadConditionsValue;
-  default?: boolean;
-  onError?: 'ignore' | 'fail';
-}
 
 /**
  * Eventos de integração (tms.driver) - Ocorre na integração de entrada (inbound) antes do roteamento.
@@ -58,13 +45,13 @@ export class IntegrationInbound {
    * Direciona a integração para diferentes eventos de outbound (saída). Ex: 'driver' para 'people'
   */
   @Column({ type: "jsonb", nullable: true })
-  routingOutboundEvent?: IntegrationInboundRoutingEvent[];
+  routingOutboundEvent?: IntegrationInboundRouting[];
 
  /** Condições de definição para ações (action) baseadas no payload canônico 
    * Direciona a integração para diferentes ações de outbound (saída). Ex: 'POST' para 'CREATE', 'PUT' para 'UPDATE'
   */
   @Column({ type: "jsonb", nullable: true })
-  routingOutboundAction?: IntegrationInboundRoutingAction[];
+  routingOutboundAction?: IntegrationInboundRouting[];
 
   /** Versão da rota. Apenas a última versão pode estar ativa. Versões anteriores não podem sofrer modificações */
   @Column({ type: "int", default: 1 })

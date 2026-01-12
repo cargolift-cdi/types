@@ -1,4 +1,5 @@
 import { HttpMethod } from "../enum/integration.enums.js";
+import { PayloadConditionsValue } from "../interfaces/payload-condition.interface.js";
 
 export interface ResponseInterpreterSuccessCondition {
   path: string;
@@ -116,7 +117,10 @@ export interface CredentialSecrets {
 }
 
 
-export interface RoutingEvent {
-  field: string;
-  value: string | number | boolean;
+export interface IntegrationInboundRouting {
+    route: string;
+    conditions?: PayloadConditionsValue;
+    default?: boolean;
+    onError?: 'ignore' | 'fail';
 }
+
