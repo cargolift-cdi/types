@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { IntegrationStatus } from "../enum/integration.enums.js";
-import { ErrorClassification } from "../enum/error-type.enum.js";
+import { ErrorSource, ErrorType } from "../enum/error-type.enum.js";
 
 
 /**
@@ -117,9 +117,13 @@ export class LogIntegrationInbound {
   @Column({ type: 'text', nullable: true })
   errorStack?: string | null;
 
-  /** Classificação do erro para o mecanismo de DLQ/retry */
-  @Column({ type: 'varchar', length: 17, nullable: true })
-  errorClassification?: ErrorClassification | null;
+  /** Classificação do erro  */
+  @Column({ type: 'varchar', length: 15, nullable: true })
+  errorType?: ErrorType | null;
+
+  /** Agente causador do erro */
+  @Column({ type: 'varchar', length: 15, nullable: true })
+  errorSource?: ErrorSource | null;
 
   /** Mensagens de avisos e alertas não críticas */
   @Column({ type: 'text', nullable: true })

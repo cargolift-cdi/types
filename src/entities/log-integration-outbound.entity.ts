@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { IntegrationStatus } from "../enum/integration.enums.js";
+import { ErrorSource, ErrorType } from "../enum/error-type.enum.js";
 
 
 /**
@@ -103,9 +104,13 @@ export class LogIntegrationOutbound {
   @Column({ type: 'text', nullable: true })
   errorStack?: string | null;
 
-  /** Classificação do erro para o mecanismo de DLQ/retry */
-  @Column({ type: 'varchar', length: 11, nullable: true })
-  errorClassification?: 'application' | 'business' | 'business_fatal' | 'application_fatal' | null;
+  /** Classificação do erro  */
+  @Column({ type: 'varchar', length: 15, nullable: true })
+  errorType?: ErrorType | null;
+
+  /** Agente causador do erro */
+  @Column({ type: 'varchar', length: 15, nullable: true })
+  errorSource?: ErrorSource | null;
 
   /** Indica se este log veio de um replay manual ou DLQ */
   // @Column({ type: 'boolean', default: false })

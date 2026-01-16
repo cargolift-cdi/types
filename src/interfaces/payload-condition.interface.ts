@@ -1,4 +1,4 @@
-import { ErrorType } from "../enum/error-type.enum.js";
+import { ErrorSource, ErrorType } from "../enum/error-type.enum.js";
 
 type Operator =
   | "="
@@ -47,4 +47,5 @@ export interface PayloadConditionResult {
   success: boolean; // true se todas as condições forem atendidas
   error?: string; // mensagem de erro em caso de falha
   errorType?: ErrorType | null; // tipo de erro
+  errorSource?: ErrorSource | null; // fonte do erro
 }
