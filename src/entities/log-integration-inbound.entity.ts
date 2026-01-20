@@ -18,6 +18,7 @@ import { ErrorSource, ErrorType } from "../enum/error-type.enum.js";
 @Index(["id"], { unique: true })
 @Index(["correlationId"], { unique: true })
 @Index(["system", "event", "action"])
+@Index(["externalReference", "event", "action"])
 @Index(["status", "updatedAt"])
 @Index(["system", "event", "updatedAt"])
 export class LogIntegrationInbound {
@@ -42,7 +43,7 @@ export class LogIntegrationInbound {
 
   /** Ação de origem (antes do roteamento) (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40, nullable: true })
-  sourceAction?: string | null;  
+  sourceAction?: string | null;
 
   /** Correlation Id */
   @Column({ name: "correlation_id", type: "varchar", length: 36 })
@@ -54,7 +55,16 @@ export class LogIntegrationInbound {
 
   /** Motivo do status (mensagem curta) */
   @Column({ type: 'varchar', length: 255, nullable: true })
-  statusReason?: string | null;  
+  statusReason?: string | null;
+
+  /**
+   * Modo de roteamento utilizado
+   * - 'direct': Roteia diretamente para sistemas de destino sem passar pelo ODS
+   * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para sistemas de destino
+   * - 'mdos': Roteia para fila de dados mestres (MDOS) antes de enviar para sistemas de destino
+   */
+  @Column({ type: "varchar", length: 20, nullable: true })
+  routingMode?: "direct" | "ods" | "mdos" | null;
 
   /** Timestamp de início da requisição na API */
   @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
@@ -135,16 +145,20 @@ export class LogIntegrationInbound {
 
   // Referência externa associada (código do cadastro, número do documento, etc)
   @Column({ type: 'varchar', length: 100, nullable: true })
-  integrationRef?: string | null;
+  externalReference?: string | null;
 
   // Tipo da referência externa ('cpf', 'número do cte', etc)
   @Column({ type: 'varchar', length: 100, nullable: true })
-  integrationRefType?: string | null;
+  externalReferenceType?: string | null;
 
-  // Campos para múltiplas referências externas
+  /**
+   * Referências externas adicionais associadas em formato JSON (e.g., múltiplos códigos relacionados)
+   * Formato: Chave-Valor (Tipo-Referência)
+   * Exemplo: { "cte": "000123", "cnpj": "12345678000199" }
+   */
   // TODO: Criar migration para índice GIN
   @Column({ type: 'jsonb', nullable: true })
-  integrationAdditionalRefs?: Record<string, any> | null;
+  additionalExternalReferences?: Record<string, any> | null;
 
   /** ID da tabela integration_inbound */
   @Column({ type: 'bigint', nullable: true  })

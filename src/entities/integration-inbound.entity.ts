@@ -1,4 +1,7 @@
 /**
+ * @fileoverview Entidade IntegrationInbound - Define configurações de integração de entrada (inbound)
+ * @author Israel A. Possoli
+ * @date 2026-01-06 
  * Representa uma rota de integração de entrada (inbound) que descreve como eventos externos
  * devem ser validados, transformados e aplicados às regras globais antes do roteamento interno.
  *
@@ -12,7 +15,6 @@
  */
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { IntegrationInboundRouting } from "../interfaces/integration.interface.js";
-
 
 /**
  * Eventos de integração (tms.driver) - Ocorre na integração de entrada (inbound) antes do roteamento.
@@ -41,15 +43,24 @@ export class IntegrationInbound {
   @Column({ type: "varchar", length: 40 })
   action!: string;
 
-  /** Condições de roteamento de ações (action) baseadas no payload de canônico 
-   * Direciona a integração para diferentes eventos de outbound (saída). Ex: 'driver' para 'people'
+  /** Modo de roteamento que sobrescreve o modo definido no evento (integration_event) 
+   * - 'direct': Roteia diretamente para sistemas de destino sem passar pelo ODS
+   * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para sistemas de destino
+   * - 'mdos': Roteia para fila de dados mestres (MDOS) antes de enviar para sistemas de destino
+   * - 'default': Usa o modo definido no evento (integration_event)
   */
+  @Column({ type: "varchar", length: 20, nullable: true })
+  overrideRoutingMode?: "default" | "direct" | "ods" | "mdos" | null;
+
+  /** Condições de roteamento de ações (action) baseadas no payload de canônico
+   * Direciona a integração para diferentes eventos de outbound (saída). Ex: 'driver' para 'people'
+   */
   @Column({ type: "jsonb", nullable: true })
   routingOutboundEvent?: IntegrationInboundRouting[];
 
- /** Condições de definição para ações (action) baseadas no payload canônico 
+  /** Condições de definição para ações (action) baseadas no payload canônico
    * Direciona a integração para diferentes ações de outbound (saída). Ex: 'POST' para 'CREATE', 'PUT' para 'UPDATE'
-  */
+   */
   @Column({ type: "jsonb", nullable: true })
   routingOutboundAction?: IntegrationInboundRouting[];
 
@@ -78,17 +89,17 @@ export class IntegrationInbound {
   rules?: Record<string, any> | null;
 
   // Expressão JSONNata para extração da referência externa (código do cadastro, número do documento, etc) a partir do payload canônico (transformado)
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: "text", nullable: true })
   refExtraction?: string | null;
 
   // Nome do tipo de referência externa (e.g., 'cte', 'cnpj', 'viagem', etc)
-  @Column({ type: 'varchar', nullable: true })
-  refType?: string | null;  
+  @Column({ type: "varchar", nullable: true })
+  refType?: string | null;
 
   // Expressão JSONNata para extração de referências adicionais (e.g., múltiplos códigos relacionados em formato Json) a partir do payload canônico (transformado)
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: "text", nullable: true })
   additionalRefsExtraction?: string | null;
-  
+
   /** Opções adicionais (reservado para uso futuro) */
   // @Column({ type: "jsonb", nullable: true })
   // options?: Record<string, any> | null;

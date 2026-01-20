@@ -12,6 +12,7 @@ export * from './interfaces/payload-condition.interface.js';
 
 // Entidades
 export * from './entities/integration-system.entity.js';
+export * from './entities/integration-event.entity.js';
 export * from './entities/integration-inbound.entity.js';
 export * from './entities/integration-outbound.entity.js';
 export * from './entities/integration-endpoint.entity.js';
@@ -25,6 +26,7 @@ export * from './enum/integration.enums.js';
 export * from './enum/error-type.enum.js';
 
 // Repositórios
+export * from './repository/integration-event-repository.service.js';
 export * from './repository/integration-inbound-repository.service.js';
 export * from './repository/integration-outbound-repository.service.js';
 export * from './repository/integration-endpoint-repository.service.js';
