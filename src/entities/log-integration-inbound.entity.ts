@@ -61,7 +61,7 @@ export class LogIntegrationInbound {
    * Modo de roteamento utilizado
    * - 'direct': Roteia diretamente para sistemas de destino sem passar pelo ODS
    * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para sistemas de destino
-   * - 'mdos': Roteia para fila de dados mestres (MDOS) antes de enviar para sistemas de destino
+   * - 'mdm': Roteia para fila de dados mestres (MDOS) antes de enviar para sistemas de destino
    */
   @Column({ type: "varchar", length: 20, nullable: true })
   routingMode?: string | null;

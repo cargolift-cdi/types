@@ -46,11 +46,11 @@ export class IntegrationInbound {
   /** Modo de roteamento que sobrescreve o modo definido no evento (integration_event) 
    * - 'direct': Roteia diretamente para sistemas de destino sem passar pelo ODS
    * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para sistemas de destino
-   * - 'mdos': Roteia para fila de dados mestres (MDOS) antes de enviar para sistemas de destino
+   * - 'mdm': Roteia para fila de dados mestres (MDOS) antes de enviar para sistemas de destino
    * - 'default': Usa o modo definido no evento (integration_event)
   */
   @Column({ type: "varchar", length: 20, nullable: true })
-  overrideRoutingMode?: "default" | "direct" | "ods" | "mdos" | null;
+  overrideRoutingMode?: "default" | "direct" | "ods" | "mdm" | null;
 
   /** Condições de roteamento de ações (action) baseadas no payload de canônico
    * Direciona a integração para diferentes eventos de outbound (saída). Ex: 'driver' para 'people'
