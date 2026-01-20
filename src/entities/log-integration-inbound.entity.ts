@@ -64,7 +64,7 @@ export class LogIntegrationInbound {
    * - 'mdos': Roteia para fila de dados mestres (MDOS) antes de enviar para sistemas de destino
    */
   @Column({ type: "varchar", length: 20, nullable: true })
-  routingMode?: "direct" | "ods" | "mdos" | null;
+  routingMode?: string | null;
 
   /** Timestamp de início da requisição na API */
   @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })

@@ -10,7 +10,7 @@ export class EventRepositoryService {
     private readonly repo: Repository<IntegrationEvent>
   ) {}
 
-  async get(event: string): Promise<IntegrationEvent[]> {
-    return await this.repo.find({ where: { event, active: true }, order: { version: "DESC" } });
+  async getFirstActive(event: string): Promise<IntegrationEvent | null> {
+    return await this.repo.findOne({ where: { event, active: true }, order: { version: "DESC" } });
   }
 }
