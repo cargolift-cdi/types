@@ -7,7 +7,7 @@
  * - Cada combinação (event, version) é única.
  * - Apenas uma versão por (event) pode estar ativa ao mesmo tempo.
  * - Versões anteriores devem ser imutáveis após a publicação de novas versões.
- * - O modo de roteamento define como o evento será processado dentro do middleware (direto, via ODS ou via MDOS).
+ * - O modo de roteamento define como o evento será processado dentro do middleware (direto, via ODS ou via MDM).
  */
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -42,7 +42,7 @@ export class IntegrationEvent {
    * Modo de roteamento do evento
    * - 'direct': Roteia diretamente para sistemas de destino sem passar pelo ODS
    * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para sistemas de destino
-   * - 'mdm': Roteia para fila de dados mestres (MDOS) antes de enviar para sistemas de destino
+   * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para sistemas de destino
    */
   @Column({ type: "varchar", length: 20, default: "ods" })
   routingMode!: "direct" | "ods" | "mdm";

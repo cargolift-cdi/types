@@ -46,7 +46,7 @@ export class IntegrationInbound {
   /** Modo de roteamento que sobrescreve o modo definido no evento (integration_event) 
    * - 'direct': Roteia diretamente para sistemas de destino sem passar pelo ODS
    * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para sistemas de destino
-   * - 'mdm': Roteia para fila de dados mestres (MDOS) antes de enviar para sistemas de destino
+   * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para sistemas de destino
    * - 'default': Usa o modo definido no evento (integration_event)
   */
   @Column({ type: "varchar", length: 20, nullable: true })

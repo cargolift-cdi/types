@@ -13,4 +13,9 @@ export class EventRepositoryService {
   async getFirstActive(event: string): Promise<IntegrationEvent | null> {
     return await this.repo.findOne({ where: { event, active: true }, order: { version: "DESC" } });
   }
+
+  // Busca todos os eventos ativos
+  async getAllActive(): Promise<IntegrationEvent[]> {
+    return await this.repo.find({ where: { active: true } });
+  }
 }
