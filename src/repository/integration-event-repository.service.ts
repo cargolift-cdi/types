@@ -18,4 +18,9 @@ export class EventRepositoryService {
   async getAllActive(): Promise<IntegrationEvent[]> {
     return await this.repo.find({ where: { active: true } });
   }
+
+  // Busca todos os eventos ativos
+  async getAllActiveByRoutingMode(routingMode: IntegrationEvent["routingMode"]): Promise<IntegrationEvent[]> {
+    return await this.repo.find({ where: { active: true, routingMode } });
+  }
 }

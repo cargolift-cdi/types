@@ -26,11 +26,14 @@ export class IntegrationSystem {
   @Column({ type: 'boolean', default: true })
   active!: boolean;
 
+  // Nome do usuário (clientId) no KeyCloak para consumir API do middleware
+  @Column({ type: 'varchar', length: 80, nullable: true })
+  apiClientId?: string;
+
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
   @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
   updatedAt!: Date;
-
 }
 
