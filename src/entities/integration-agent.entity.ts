@@ -1,28 +1,28 @@
 /**
- * Representa um sistema de integração registrado na aplicação.
+ * Representa um agente de integração registrado na aplicação.
  *
- * Cada instância mapeia uma linha da tabela "integration_system".
+ * Cada instância mapeia uma linha da tabela "integration_agent".
  *
- * @property id Identificador único do sistema de integração (armazenado como bigint no banco). Mantém-se como string no TypeScript para evitar perda de precisão com bigints.
- * @property system Nome único do sistema de integração (ex.: 'erp', 'tms'). Campo varchar com até 80 caracteres.
- * @property active Flag que indica se o sistema está ativo. Valor booleano; padrão: true.
+ * @property id Identificador único do agente de integração (armazenado como bigint no banco). Mantém-se como string no TypeScript para evitar perda de precisão com bigints.
+ * @property agent Nome único do agente de integração (ex.: 'erp', 'tms'). Campo varchar com até 80 caracteres.
+ * @property active Flag que indica se o agente está ativo. Valor booleano; padrão: true.
  * @property createdAt Carimbo de data/hora de criação (timestamptz).
  * @property updatedAt Carimbo de data/hora da última atualização (timestamptz).
  */
 import { Column, Entity, PrimaryGeneratedColumn, Index, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity({ name: 'integration_system' })
-@Index(["system"], { unique: true })
-export class IntegrationSystem {
-  /** Identificador único do sistema de integração */
+@Entity({ name: 'integration_agent' })
+@Index(["agent"], { unique: true })
+export class IntegrationAgent {
+  /** Identificador único do agente de integração */
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
-  /** Nome do sistema de integração (e.g., 'erp', 'tms') */
+  /** Nome do agente de integração (e.g., 'erp', 'tms') */
   @Column({ type: 'varchar', length: 80 })
-  system!: string; 
+  agent!: string; 
 
-  /** Se o sistema está ativo */
+  /** Se o agente está ativo */
   @Column({ type: 'boolean', default: true })
   active!: boolean;
 

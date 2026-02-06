@@ -11,10 +11,10 @@ export class InboundRepositoryService {
     private readonly repo: Repository<IntegrationInbound>
   ) {}
 
-  async get(system: string, event: string, action: string): Promise<IntegrationInbound[]> {
+  async get(entity: string, event: string, action: string): Promise<IntegrationInbound[]> {
     const qb = this.repo
       .createQueryBuilder("integration_inbound")
-      .where("integration_inbound.system = :system", { system })
+      .where("integration_inbound.entity = :entity", { entity })
       .andWhere("integration_inbound.event = :event", { event })
       .andWhere("integration_inbound.active = :active", { active: true })
       .andWhere(
@@ -45,7 +45,7 @@ export class InboundRepositoryService {
         END`,
         "ASC"
       )
-      .addOrderBy("integration_inbound.system", "ASC")
+      .addOrderBy("integration_inbound.entity", "ASC")
       .addOrderBy("integration_inbound.event", "ASC")
       .addOrderBy("integration_inbound.version", "DESC")
       .getMany();
@@ -53,7 +53,7 @@ export class InboundRepositoryService {
     const resultMap = new Map<string, IntegrationInbound>();
 
     for (const row of rows) {
-      const key = `${row.system}::${row.event}::${row.action}`;
+      const key = `${row.entity}::${row.event}::${row.action}`;
       if (!resultMap.has(key)) {
         resultMap.set(key, row);
       }
@@ -62,16 +62,16 @@ export class InboundRepositoryService {
     return Array.from(resultMap.values());
   }
 
-  async getFirstActive(system: string, event: string, action: string): Promise<IntegrationInbound | null> {
-    const records = await this.get(system, event, action);
+  async getFirstActive(entity: string, event: string, action: string): Promise<IntegrationInbound | null> {
+    const records = await this.get(entity, event, action);
     return records.length > 0 ? records[0] : null;
   }
 
   /*
-  async getRule(system: string, event: string): Promise<RulesConfiguration> {
+  async getRule(entity: string, event: string): Promise<RulesConfiguration> {
     return this.repo
       .find({
-        where: { system, event, active: true },
+        where: { entity, event, active: true },
         order: { version: "DESC" } as any,
       })
       .then((events) => {
@@ -84,10 +84,10 @@ export class InboundRepositoryService {
       });
   }
 
-  async getTransformationExpression(system: string, event: string): Promise<string> {
+  async getTransformationExpression(entity: string, event: string): Promise<string> {
     return this.repo
       .find({
-        where: { system, event, active: true },
+        where: { entity, event, active: true },
         order: { version: "DESC" } as any,
       })
       .then((events) => {

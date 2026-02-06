@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { IntegrationSystem } from "../entities/integration-system.entity.js";
+import { IntegrationSystem } from "../entities/integration-agent.entity.js";
 
 @Injectable()
 export class SystemRepositoryService {
@@ -10,8 +10,8 @@ export class SystemRepositoryService {
     private readonly repo: Repository<IntegrationSystem>
   ) {}
 
-  async get(system: string): Promise<IntegrationSystem | null> {
-    return await this.repo.findOne({ where: { system, active: true } });
+  async get(entity: string): Promise<IntegrationSystem | null> {
+    return await this.repo.findOne({ where: { entity, active: true } });
   }
 
   // Busca todos os sistemas ativos

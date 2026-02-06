@@ -2,12 +2,12 @@
  * @fileoverview Entidade IntegrationInbound - Define configurações de integração de entrada (inbound)
  * @author Israel A. Possoli
  * @date 2026-01-06 
- * Representa uma rota de integração de entrada (inbound) que descreve como eventos externos
- * devem ser validados, transformados e aplicados às regras globais antes do roteamento interno.
+ * Representa uma rota de integração de entrada (inbound) que descreve como entidades externas (o que está sendo integrado)
+ * devem ser validados, transformados e aplicados às regras globais antes do roteamento dentro do ESB para o MDM, ODS ou agentes de destino.
  *
  * @remarks
- * - Cada combinação (system, event, action, version) é única.
- * - Apenas uma versão por (system, event, action) pode estar ativa ao mesmo tempo.
+ * - Cada combinação (agent, entity, action, version) é única.
+ * - Apenas uma versão por (agent, entity, action) pode estar ativa ao mesmo tempo.
  * - Versões anteriores devem ser imutáveis após a publicação de novas versões.
  * - Transformações usam expressões JSONata para mapear payloads externos ao formato canônico interno.
  *
@@ -15,15 +15,17 @@
  */
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { IntegrationInboundRouting } from "../interfaces/integration.interface.js";
+import { IntegrationActions } from "../enum/integration.enums.js";
+
+
 
 /**
- * Eventos de integração (tms.driver) - Ocorre na integração de entrada (inbound) antes do roteamento.
- * Define expressões JSONata para transformar mensagens de eventos externos em formato JSON canônico interno.
- * Também armazena configurações de regras global (BRE) associadas ao evento.
+ * Perfil de rotas de integração de entrada (inbound) para validação, transformação e roteamento.
+ * Utilize agent + entity + action no IntegrationEvent para referenciar estas rotas.
  */
 @Entity({ name: "integration_inbound" })
-@Index(["system", "event", "action", "version"], { unique: true })
-@Index("uq_integration_inbound_active", ["system", "event", "action"], {
+@Index(["agent", "entity", "action", "version"], { unique: true })
+@Index("uq_integration_inbound_active", ["agent", "entity", "action"], {
   unique: true,
   where: `"active" = true`,
 })
@@ -31,38 +33,49 @@ export class IntegrationInbound {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
-  /** Sistema de origem (e.g., 'erp') */
+  /** Agente de integração de origem (e.g., 'erp') */
   @Column({ type: "varchar", length: 80 })
-  system!: string;
+  agent!: string;
 
-  /** Evento (e.g., 'driver') */
+  /** Entidade - Representa o que está sendo integrado. (e.g., 'driver', 'cte', etc) */
   @Column({ type: "varchar", length: 80 })
-  event!: string;
+  entity!: string;
 
-  /** Ação (e.g., 'create', 'update', 'delete', etc */
+  /** Método HTTP (e.g., 'GET', 'POST', 'PUT', 'DELETE', etc), será usado para identificar qual a ação que será executada
+   * Pode ser usado para diferenciar ações em um mesmo endpoint de integração. Ex: 'POST' para 'CREATE', 'PUT' para 'UPDATE', etc.
+   * Também pode ser usado para roteamento condicional baseado no método HTTP, caso um mesma entidade de integração receba chamadas com métodos diferentes.
+   * Exemplo: um endpoint de integração que recebe tanto 'POST' para criar um cadastro quanto 'PUT' para atualizar o cadastro, ambos mapeados para a mesma entidade 'driver' mas com ações diferentes ('create' e 'update', por exemplo).
+   * Pode-se usar vários métodos para a mesma ação, caso queira mapear 'POST' e 'PUT' para a ação 'upsert', por exemplo. Neste caso, o campo method pode conter uma lista de métodos HTTP (ex: "POST, PUT") e a lógica de roteamento deve considerar isso.
+   */
+  @Column({ type: "varchar", length: 80 })
+  method!: string;  
+
+  /** Ação dentro do middleware (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
-  action!: string;
+  action!: IntegrationActions;
 
-  /** Modo de roteamento que sobrescreve o modo definido no evento (integration_event) 
-   * - 'direct': Roteia diretamente para sistemas de destino sem passar pelo ODS
-   * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para sistemas de destino
-   * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para sistemas de destino
-   * - 'default': Usa o modo definido no evento (integration_event)
+  /** Modo de roteamento que sobrescreve o modo definido na entidade (integration_entity) 
+   * - 'direct': Roteia diretamente para os agentes de destino sem passar pelo ODS
+   * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para os agentes de destino
+   * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para os agentes de destino
+   * - 'default': Usa o modo definido na entidade (integration_entity)
   */
   @Column({ type: "varchar", length: 20, nullable: true })
   overrideRoutingMode?: "default" | "direct" | "ods" | "mdm" | null;
 
-  /** Condições de roteamento de ações (action) baseadas no payload de canônico
-   * Direciona a integração para diferentes eventos de outbound (saída). Ex: 'driver' para 'people'
+  /** Condições de definição para entidades (entity) baseadas no payload canônico.
+   * Sobrepõe a entidade definida no campo 'entity' para roteamento condicional baseado no conteúdo do payload. Ex: Uma integração de pessoa física (people) quando no payload tiver um campo "type" com valor "driver", então a entidade será 'driver' ao invés de 'people'
+   * Útil para casos onde o mesmo endpoint de integração recebe chamadas com a mesma combinação de método HTTP e entidade, mas a entidade a ser processada depende do conteúdo do payload.
    */
   @Column({ type: "jsonb", nullable: true })
-  routingOutboundEvent?: IntegrationInboundRouting[];
+  routingEntity?: IntegrationInboundRouting[];
 
-  /** Condições de definição para ações (action) baseadas no payload canônico
-   * Direciona a integração para diferentes ações de outbound (saída). Ex: 'POST' para 'CREATE', 'PUT' para 'UPDATE'
+  /** Condições de definição para ações (action) baseadas no payload canônico.
+   * Sobrepõe a ação definida no campo 'action' para roteamento condicional baseado no conteúdo do payload. Ex: Se o payload tiver um campo "operation" com valor "update", então a ação será 'update' ao invés de 'create', mesmo que o método HTTP seja 'POST'.
+   * Útil para casos onde o mesmo endpoint de integração recebe chamadas com a mesma combinação de método HTTP e entidade, mas a ação a ser executada depende do conteúdo do payload.
    */
   @Column({ type: "jsonb", nullable: true })
-  routingOutboundAction?: IntegrationInboundRouting[];
+  routingAction?: IntegrationInboundRouting[];
 
   /** Versão da rota. Apenas a última versão pode estar ativa. Versões anteriores não podem sofrer modificações */
   @Column({ type: "int", default: 1 })

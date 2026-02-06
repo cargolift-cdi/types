@@ -10,10 +10,10 @@ export class OutboundRepositoryService {
     private readonly repo: Repository<IntegrationOutbound>
   ) {}
 
-  async getRoutes(system: string, event: string, action: string): Promise<IntegrationOutbound[]> {
+  async getRoutes(entity: string, event: string, action: string): Promise<IntegrationOutbound[]> {
     const qb = this.repo
       .createQueryBuilder("integration_outbound")
-      .where("integration_outbound.system = :system", { system })
+      .where("integration_outbound.entity = :entity", { entity })
       .andWhere("integration_outbound.event = :event", { event })
       .andWhere("integration_outbound.active = :active", { active: true })
       .andWhere(
@@ -47,10 +47,10 @@ export class OutboundRepositoryService {
     return qb.getMany();
   }
 
-  async find(system: string, event: string, action: string): Promise<IntegrationOutbound | null> {
+  async find(entity: string, event: string, action: string): Promise<IntegrationOutbound | null> {
     const qb = this.repo
       .createQueryBuilder("integration_outbound")
-      .where("integration_outbound.system = :system", { system })
+      .where("integration_outbound.entity = :entity", { entity })
       .andWhere("integration_outbound.event = :event", { event })
       .andWhere("integration_outbound.active = :active", { active: true })
       .andWhere(

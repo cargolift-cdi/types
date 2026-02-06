@@ -17,29 +17,29 @@ import { ErrorSource, ErrorType } from "../enum/error-type.enum.js";
 @Entity({ name: "log_integration_inbound" })
 @Index(["id"], { unique: true })
 @Index(["correlationId"], { unique: true })
-@Index(["system", "event", "action"])
-@Index(["externalReference", "event", "action"])
+@Index(["agent", "entity", "action"])
+@Index(["externalReference", "entity", "action"])
 @Index(["status", "updatedAt"])
-@Index(["system", "event", "updatedAt"])
+@Index(["agent", "entity", "updatedAt"])
 export class LogIntegrationInbound {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
-  /** Sistema de destino (e.g., 'erp', 'wms') */
-  @Column({ name: "system", type: "varchar", length: 80 })
-  system!: string;
+  /** Agente de destino (e.g., 'erp', 'wms') */
+  @Column({ name: "agent", type: "varchar", length: 80 })
+  agent!: string;
 
-  /** Evento (chave) (e.g., 'driver' or 'driver.created') */
+  /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
   @Column({ type: "varchar", length: 80 })
-  event!: string;
+  entity!: string;
 
   /** Ação (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
   action!: string;
 
-  /** Evento de origem (antes do roteamento) (e.g., 'driver' or 'driver.created') */
+  /** Entidade de origem (antes do roteamento) (e.g., 'driver' or 'driver.created') */
   @Column({ type: "varchar", length: 80, nullable: true })
-  sourceEvent?: string | null;
+  sourceEntity?: string | null;
 
   /** Ação de origem (antes do roteamento) (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40, nullable: true })
@@ -59,9 +59,9 @@ export class LogIntegrationInbound {
 
   /**
    * Modo de roteamento utilizado
-   * - 'direct': Roteia diretamente para sistemas de destino sem passar pelo ODS
-   * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para sistemas de destino
-   * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para sistemas de destino
+   * - 'direct': Roteia diretamente para agentes de destino sem passar pelo ODS
+   * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para agentes de destino
+   * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para agentes de destino
    */
   @Column({ type: "varchar", length: 20, nullable: true })
   routingMode?: string | null;

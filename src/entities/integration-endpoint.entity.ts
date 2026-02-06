@@ -1,17 +1,21 @@
 /**
- * Definição de roteamento e configuração de entrega/saída para eventos de integração (Outbound).
+ * @fileoverview Entidade IntegrationOutbound - Define configurações de integração de saída (outbound)
+ * @author Israel A. Possoli
+ * @date 2026-01-06 * 
+
+ * Definição de roteamento e configuração de entrega/saída para entidades de integração (Outbound).
  *
- * Representa uma rota/endpoint de destino para um evento específico, incluindo
+ * Representa uma rota/endpoint de destino para uma entidade específica, incluindo
  * informações de transporte, endpoint, credenciais, políticas de retry, rate-limiting,
  * circuit breaker, idempotência e configurações específicas por protocolo (HTTP, filas/streams).
  *
  * Observações importantes:
- * - A combinação (system, event, action) é única. Há também um índice condicional que garante
+ * - A combinação (agent, entity, action) é única. Há também um índice condicional que garante
  *   unicidade quando active = true (ou seja, apenas uma rota ativa por chave).
  * - O campo `id` é um bigint no banco — no TypeScript é mantido como string para segurança.
  * 
  * @remarks
- * - Esta entidade centraliza tanto o roteamento (por sistema/evento/ação) quanto as políticas e
+ * - Esta entidade centraliza tanto o roteamento (por agent/entity/action) quanto as políticas e
  *   configurações de entrega, permitindo múltiplos tipos de transporte e adaptações por destino.
  * - Campos JSONB (httpConfig, queueConfig, tls, retryPolicy, rateLimit, breakerPolicy, idempotency)
  *   devem seguir os formatos esperados pelo componente de entrega para serem interpretados corretamente.* 
@@ -41,11 +45,11 @@ import { BreakerPolicy, EndpointConfig, EndpointQueueConfig, EndpointTlsConfig, 
 
 
 /**
- * Definição de roteamento de saída por chave (evento) e destino.
+ * Definição de roteamento de saída por chave (entity) e destino.
  * Agora inclui também as configurações de Target/Delivery (protocolo, endpoint, políticas, etc.).
  */
 @Entity({ name: "integration_endpoint" })
-@Index("uq_integration_endpoint_active", ["system", "event", "action"], {
+@Index("uq_integration_endpoint_active", ["agent", "entity", "action"], {
   unique: true,
   where: `"active" = true`,
 })
@@ -54,13 +58,13 @@ export class IntegrationEndpoint {
   id!: string; // manter string no TS para bigint seguro
 
 
-  /** Sistema de destino (e.g., 'erp', 'wms') */
-  @Column({ name: "target_system", type: "varchar", length: 80 })
-  system!: string;
+  /** Agente de destino (e.g., 'erp', 'wms') */
+  @Column({ name: "target_agent", type: "varchar", length: 80 })
+  agent!: string;
 
-  /** Evento (chave) (e.g., 'driver' or 'driver.created') */
+  /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
   @Column({ type: "varchar", length: 80 })
-  event!: string;
+  entity!: string;
 
   /** Ação (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })

@@ -1,15 +1,21 @@
 /**
- * Representa a definição de roteamento outbound para eventos originados por um sistema.
+ * @fileoverview Entidade IntegrationOutbound - Define configurações de integração de saída (outbound)
+ * @author Israel A. Possoli
+ * @date 2026-01-06 * 
+ * 
+ * Representa a definição de roteamento outbound para integração entre sistemas. 
+ * Cada registro define uma rota de saída para uuma entidade específico, incluindo o agente de destino, versão e regras associadas.
  *
  * Esta entidade mapeia uma rota de saída por chave de origem e destino, armazenando
- * regras e metadados necessários para encaminhar eventos (por exemplo, do TMS para o WMS).
- * Cada registro corresponde a um alvo (targetSystem) para um evento específico e versão.
+ * regras e metadados necessários para encaminhar entidades (por exemplo, do TMS para o WMS).
+ * Cada registro corresponde a um alvo (targetAgent) para uuma entidade específico e versão.
  *
  * @remarks
- * - Há um índice único composto por (system, event, targetSystem, version) garantindo que
+ * - Há um índice único composto por (agent, entity, action, targetAgent, version) garantindo que
  *   não existam duplicatas de rota para a mesma combinação.
  * - Somente a versão mais recente de uma rota pode estar ativa; versões anteriores devem ser imutáveis.
  */
+
 import {
   Column,
   CreateDateColumn,
@@ -22,31 +28,31 @@ import {
 
 
 @Entity({ name: "integration_outbound" })
-@Index(["system", "event", "action", "targetSystem", "version"], { unique: true })
-@Index("uq_integration_outbound_active", ["system", "event", "action", "targetSystem"], {
+@Index(["agent", "entity", "action", "targetAgent", "version"], { unique: true })
+@Index("uq_integration_outbound_active", ["agent", "entity", "action", "targetAgent"], {
   unique: true,
   where: `"active" = true`,
 })
 export class IntegrationOutbound {
-  /** Identificador único do sistema de integração */
+  /** Identificador único do agente de integração */
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
-  /** Sistema de origem (e.g., 'tms') */
+  /** Agente de origem (e.g., 'tms') */
   @Column({ type: "varchar", length: 80 })
-  system!: string;
+  agent!: string;
 
   /** Evento (chave) (e.g., 'driver' or 'driver.created') */
   @Column({ type: "varchar", length: 80 })
-  event!: string;
+  entity!: string;
 
   /** Ação (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
   action!: string;  
 
-  /** Sistema de destino (e.g., 'erp', 'wms') */
-  @Column({ name: "target_system", type: "varchar", length: 80 })
-  targetSystem!: string;
+  /** Agente de destino (e.g., 'erp', 'wms') */
+  @Column({ name: "target_agent", type: "varchar", length: 80 })
+  targetAgent!: string;
 
 
   /** Versão da rota. Apenas a última versão pode estar ativa. Versões anteriores não podem sofrer modificações */

@@ -17,20 +17,20 @@ import { ErrorSource, ErrorType } from "../enum/error-type.enum.js";
 @Entity({ name: "log_integration_inbound" })
 @Index(["id"], { unique: true })
 @Index(["correlationId"], { unique: true })
-@Index(["system", "event", "action"])
+@Index(["agent", "entity", "action"])
 @Index(["status", "updatedAt"])
-@Index(["system", "event", "updatedAt"])
+@Index(["agent", "entity", "updatedAt"])
 export class LogIntegrationOutbound {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
   /** Sistema de destino (e.g., 'erp', 'wms') */
-  @Column({ name: "system", type: "varchar", length: 80 })
-  system!: string;
+  @Column({ name: "agent", type: "varchar", length: 80 })
+  agent!: string;
 
   /** Evento (chave) (e.g., 'driver' or 'driver.created') */
   @Column({ type: "varchar", length: 80 })
-  event!: string;
+  entity!: string;
 
   /** Ação (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })

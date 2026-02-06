@@ -14,6 +14,12 @@ export enum HttpMethod {
   DELETE = 'DELETE',
 }
 
+export enum IntegrationActions {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  UPSERT = 'upsert',
+}
 
 
 export enum AuthType {

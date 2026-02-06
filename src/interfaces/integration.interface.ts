@@ -1,6 +1,8 @@
 import { HttpMethod } from "../enum/integration.enums.js";
 import { PayloadConditionsValue } from "../interfaces/payload-condition.interface.js";
 
+
+
 export interface ResponseInterpreterSuccessCondition {
   path: string;
   equals?: string | number | boolean | null;
