@@ -33,6 +33,9 @@ export class LogIntegrationInbound {
   @Column({ type: "varchar", length: 80 })
   entity!: string;
 
+  @Column({ type: "varchar", length: 80 })
+  method!: string;    
+
   /** Ação (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
   action!: string;
