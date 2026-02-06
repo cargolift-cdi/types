@@ -45,7 +45,7 @@ export class InboundRepositoryService {
         END`,
         "ASC"
       )
-      .addOrderBy("integration_inbound.entity", "ASC")
+      .addOrderBy("integration_inbound.agent", "ASC")
       .addOrderBy("integration_inbound.entity", "ASC")
       .addOrderBy("integration_inbound.version", "DESC")
       .getMany();
@@ -53,7 +53,7 @@ export class InboundRepositoryService {
     const resultMap = new Map<string, IntegrationInbound>();
 
     for (const row of rows) {
-      const key = `${row.entity}::${row.entity}::${row.method}`;
+      const key = `${row.agent}::${row.entity}::${row.method}`;
       if (!resultMap.has(key)) {
         resultMap.set(key, row);
       }
