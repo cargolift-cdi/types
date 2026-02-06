@@ -26,8 +26,8 @@ export * from './enum/integration.enums.js';
 export * from './enum/error-type.enum.js';
 
 // Repositórios
+export * from './repository/integration-agent-repository.service.js';
 export * from './repository/integration-entity-repository.service.js';
-export * from './repository/integration-event-repository.service.js';
 export * from './repository/integration-inbound-repository.service.js';
 export * from './repository/integration-outbound-repository.service.js';
 export * from './repository/integration-endpoint-repository.service.js';

@@ -21,7 +21,7 @@ import { IntegrationActions } from "../enum/integration.enums.js";
 
 /**
  * Perfil de rotas de integração de entrada (inbound) para validação, transformação e roteamento.
- * Utilize agent + entity + action no IntegrationEvent para referenciar estas rotas.
+ * Utilize agent + entity + action no IntegrationEntity para referenciar estas rotas.
  */
 @Entity({ name: "integration_inbound" })
 @Index(["agent", "entity", "action", "version"], { unique: true })

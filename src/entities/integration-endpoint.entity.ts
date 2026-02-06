@@ -143,7 +143,7 @@ export class IntegrationEndpoint {
 
   /**
    * Rate limiting por rota:
-   * { limit: 100, intervalMs: 1000, burst?: 50, key?: 'targetSystem' | 'endpoint' | 'custom' }
+   * { limit: 100, intervalMs: 1000, burst?: 50, key?: 'targetAgent' | 'endpoint' | 'custom' }
    */
   @Column({ name: "rate_limit", type: "jsonb", nullable: true })
   rateLimit?: RateLimit | null;

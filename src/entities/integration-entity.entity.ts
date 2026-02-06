@@ -40,9 +40,9 @@ export class IntegrationEntity {
 
   /**
    * Modo de roteamento da entidade
-   * - 'direct': Roteia diretamente para sistemas de destino sem passar pelo ODS
-   * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para sistemas de destino
-   * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para sistemas de destino
+   * - 'direct': Roteia diretamente para entidades de destino sem passar pelo ODS
+   * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para entidades de destino
+   * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para entidades de destino
    */
   @Column({ type: "varchar", length: 20 })
   routingMode!: "direct" | "ods" | "mdm";

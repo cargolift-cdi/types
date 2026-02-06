@@ -3,12 +3,12 @@
  * @author Israel A. Possoli
  * @date 2026-01-06 * 
  * 
- * Representa a definição de roteamento outbound para integração entre sistemas. 
- * Cada registro define uma rota de saída para uuma entidade específico, incluindo o agente de destino, versão e regras associadas.
+ * Representa a definição de roteamento outbound para integração entre agentes. 
+ * Cada registro define uma rota de saída para uma agente e entidade específica , versão e regras associadas.
  *
  * Esta entidade mapeia uma rota de saída por chave de origem e destino, armazenando
  * regras e metadados necessários para encaminhar entidades (por exemplo, do TMS para o WMS).
- * Cada registro corresponde a um alvo (targetAgent) para uuma entidade específico e versão.
+ * Cada registro corresponde a um alvo (targetAgent) para uma agente específica e versão.
  *
  * @remarks
  * - Há um índice único composto por (agent, entity, action, targetAgent, version) garantindo que
@@ -42,7 +42,7 @@ export class IntegrationOutbound {
   @Column({ type: "varchar", length: 80 })
   agent!: string;
 
-  /** Evento (chave) (e.g., 'driver' or 'driver.created') */
+  /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
   @Column({ type: "varchar", length: 80 })
   entity!: string;
 

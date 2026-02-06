@@ -28,7 +28,7 @@ export class LogIntegrationOutbound {
   @Column({ name: "agent", type: "varchar", length: 80 })
   agent!: string;
 
-  /** Evento (chave) (e.g., 'driver' or 'driver.created') */
+  /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
   @Column({ type: "varchar", length: 80 })
   entity!: string;
 
