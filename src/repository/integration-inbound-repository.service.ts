@@ -11,7 +11,7 @@ export class InboundRepositoryService {
     private readonly repo: Repository<IntegrationInbound>
   ) {}
 
-  async get(agent: string, entity: string, action: string): Promise<IntegrationInbound[]> {
+  async get(agent: string, entity: string, method: string): Promise<IntegrationInbound[]> {
     const qb = this.repo
       .createQueryBuilder("integration_inbound")
       .where("integration_inbound.agent = :agent", { agent })
@@ -19,28 +19,28 @@ export class InboundRepositoryService {
       .andWhere("integration_inbound.active = :active", { active: true })
       .andWhere(
         `(
-          integration_inbound.action = 'all' OR
-          integration_inbound.action = :action OR
-          integration_inbound.action LIKE :actionListPrefix OR
-          integration_inbound.action LIKE :actionListInfix OR
-          integration_inbound.action LIKE :actionListSuffix
+          integration_inbound.method = 'all' OR
+          integration_inbound.method = :method OR
+          integration_inbound.method LIKE :methodListPrefix OR
+          integration_inbound.method LIKE :methodListInfix OR
+          integration_inbound.method LIKE :methodListSuffix
         )`,
         {
-          action,
-          actionListPrefix: `${action},%`,
-          actionListInfix: `%,${action},%`,
-          actionListSuffix: `%,${action}`,
+          method,
+          methodListPrefix: `${method},%`,
+          methodListInfix: `%,${method},%`,
+          methodListSuffix: `%,${method}`,
         }
       );
 
     const rows = await qb
       .orderBy(
         `CASE
-          WHEN integration_inbound.action = :action THEN 1
-          WHEN integration_inbound.action LIKE :actionListPrefix OR
-               integration_inbound.action LIKE :actionListInfix OR
-               integration_inbound.action LIKE :actionListSuffix THEN 2
-          WHEN integration_inbound.action = 'all' THEN 3
+          WHEN integration_inbound.method = :method THEN 1
+          WHEN integration_inbound.method LIKE :methodListPrefix OR
+               integration_inbound.method LIKE :methodListInfix OR
+               integration_inbound.method LIKE :methodListSuffix THEN 2
+          WHEN integration_inbound.method = 'all' THEN 3
           ELSE 4
         END`,
         "ASC"
@@ -53,7 +53,7 @@ export class InboundRepositoryService {
     const resultMap = new Map<string, IntegrationInbound>();
 
     for (const row of rows) {
-      const key = `${row.entity}::${row.entity}::${row.action}`;
+      const key = `${row.entity}::${row.entity}::${row.method}`;
       if (!resultMap.has(key)) {
         resultMap.set(key, row);
       }
@@ -62,43 +62,9 @@ export class InboundRepositoryService {
     return Array.from(resultMap.values());
   }
 
-  async getFirstActive(agent: string, entity: string, action: string): Promise<IntegrationInbound | null> {
-    const records = await this.get(agent, entity, action);
+  async getFirstActive(agent: string, entity: string, method: string): Promise<IntegrationInbound | null> {
+    const records = await this.get(agent, entity, method);
     return records.length > 0 ? records[0] : null;
   }
-
-  /*
-  async getRule(entity: string, entity: string): Promise<RulesConfiguration> {
-    return this.repo
-      .find({
-        where: { entity, entity, active: true },
-        order: { version: "DESC" } as any,
-      })
-      .then((entitys) => {
-        if (entitys.length > 0) {
-          return (entitys[0].rules || { rules: [] }) as RulesConfiguration;
-        }
-      })
-      .catch((err) => {
-        throw err;
-      });
-  }
-
-  async getTransformationExpression(entity: string, entity: string): Promise<string> {
-    return this.repo
-      .find({
-        where: { entity, entity, active: true },
-        order: { version: "DESC" } as any,
-      })
-      .then((entitys) => {
-        if (entitys.length > 0) {
-          return entitys[0].transformation || "";
-        }
-      })
-      .catch((err) => {
-        throw err;
-      });
-  }
-      */
   
 }

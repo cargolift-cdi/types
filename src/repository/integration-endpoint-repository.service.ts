@@ -14,10 +14,10 @@ export class EndpointRepositoryService {
     private readonly repoCredential: Repository<IntegrationCredential>,
   ) {}
 
-  async find(entity: string, entity: string, action: string): Promise<IntegrationEndpoint | null> {
+  async find(agent: string, entity: string, action: string): Promise<IntegrationEndpoint | null> {
     const qb = this.repo
       .createQueryBuilder('integration_endpoint')
-      .where('integration_endpoint.entity = :entity', { entity })
+      .where('integration_endpoint.agent = :agent', { agent })
       .andWhere('integration_endpoint.entity = :entity', { entity })
       .andWhere('integration_endpoint.active = :active', { active: true })
       .andWhere(
