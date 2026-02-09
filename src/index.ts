@@ -24,13 +24,3 @@ export * from './entities/log-integration-outbound.entity.js';
 // Enum
 export * from './enum/integration.enums.js';
 export * from './enum/error-type.enum.js';
-
-// Repositórios
-export * from './repository/integration-agent-repository.service.js';
-export * from './repository/integration-entity-repository.service.js';
-export * from './repository/integration-inbound-repository.service.js';
-export * from './repository/integration-outbound-repository.service.js';
-export * from './repository/integration-endpoint-repository.service.js';
-export * from './repository/integration-credential-repository.service.js';
-export * from './repository/diagnostic-latency-repository.service.js';
-export * from './repository/log-integration-inbound.service.js';
