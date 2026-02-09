@@ -17,8 +17,6 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, Update
 import { IntegrationInboundRouting } from "../interfaces/integration.interface.js";
 import { IntegrationActions } from "../enum/integration.enums.js";
 
-
-
 /**
  * Perfil de rotas de integração de entrada (inbound) para validação, transformação e roteamento.
  * Utilize agent + entity + action no IntegrationEntity para referenciar estas rotas.
@@ -48,34 +46,11 @@ export class IntegrationInbound {
    * Pode-se usar vários métodos para a mesma ação, caso queira mapear 'POST' e 'PUT' para a ação 'upsert', por exemplo. Neste caso, o campo method pode conter uma lista de métodos HTTP (ex: "POST, PUT") e a lógica de roteamento deve considerar isso.
    */
   @Column({ type: "varchar", length: 80 })
-  method!: string;  
+  method!: string;
 
   /** Ação dentro do middleware (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
   action!: IntegrationActions;
-
-  /** Modo de roteamento que sobrescreve o modo definido na entidade (integration_entity) 
-   * - 'direct': Roteia diretamente para os agentes de destino sem passar pelo ODS
-   * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para os agentes de destino
-   * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para os agentes de destino
-   * - 'default': Usa o modo definido na entidade (integration_entity)
-  */
-  @Column({ type: "varchar", length: 20, nullable: true })
-  overrideRoutingMode?: "default" | "direct" | "ods" | "mdm" | null;
-
-  /** Condições de definição para entidades (entity) baseadas no payload canônico.
-   * Sobrepõe a entidade definida no campo 'entity' para roteamento condicional baseado no conteúdo do payload. Ex: Uma integração de pessoa física (people) quando no payload tiver um campo "type" com valor "driver", então a entidade será 'driver' ao invés de 'people'
-   * Útil para casos onde o mesmo endpoint de integração recebe chamadas com a mesma combinação de método HTTP e entidade, mas a entidade a ser processada depende do conteúdo do payload.
-   */
-  @Column({ type: "jsonb", nullable: true })
-  routingEntity?: IntegrationInboundRouting[];
-
-  /** Condições de definição para ações (action) baseadas no payload canônico.
-   * Sobrepõe a ação definida no campo 'action' para roteamento condicional baseado no conteúdo do payload. Ex: Se o payload tiver um campo "operation" com valor "update", então a ação será 'update' ao invés de 'create', mesmo que o método HTTP seja 'POST'.
-   * Útil para casos onde o mesmo endpoint de integração recebe chamadas com a mesma combinação de método HTTP e entidade, mas a ação a ser executada depende do conteúdo do payload.
-   */
-  @Column({ type: "jsonb", nullable: true })
-  routingAction?: IntegrationInboundRouting[];
 
   /** Versão da rota. Apenas a última versão pode estar ativa. Versões anteriores não podem sofrer modificações */
   @Column({ type: "int", default: 1 })
@@ -89,14 +64,33 @@ export class IntegrationInbound {
   @Column({ type: "varchar", length: 500, nullable: true })
   description?: string | null;
 
-  /** Pré-validação do payload de origem, antes da transformação para o formato canônico */
+  /** Condições de definição para entidades (entity) baseadas no payload canônico (transformado).
+   * É aplicado dentro do ESB
+   * Sobrepõe a entidade definida no campo 'entity' para roteamento condicional baseado no conteúdo do payload. 
+   * Ex: Uma integração de pessoa física (people) quando no payload tiver um campo "type" com valor "driver", então a entidade será 'driver' ao invés de 'people'
+   * Útil para casos onde o mesmo endpoint de integração recebe chamadas com a mesma combinação de método HTTP e entidade, mas a entidade a ser processada depende do conteúdo do payload.
+   */
+  @Column({ type: "jsonb", nullable: true })
+  routingEntity?: IntegrationInboundRouting[];
+
+  /** Condições de definição para ações (action) baseadas no payload canônico (transformado).
+   * É aplicado dentro do ESB
+   * Sobrepõe a ação definida no campo 'action' para roteamento condicional baseado no conteúdo do payload. 
+   * Ex: Se o payload tiver um campo "operation" com valor "update", então a ação será 'update' ao invés de 'create', mesmo que o método HTTP seja 'POST'.
+   * Útil para casos onde o mesmo endpoint de integração recebe chamadas com a mesma combinação de método HTTP e entidade, mas a ação a ser executada depende do conteúdo do payload.
+   */
+  @Column({ type: "jsonb", nullable: true })
+  routingAction?: IntegrationInboundRouting[];
+
+  
+  /** Pré-validação do payload do agente de integração (antes da transformação para o formato canônico) */
   @Column({ type: "jsonb", nullable: true })
   validation?: Record<string, any> | null;
-
+  
   /** Expressão JSONata para transformação do payload de entrada para o formato canônico */
   @Column({ type: "text", nullable: true })
   transformation?: string | null;
-
+  
   /** Regra global (BRE RulesConfiguration) aplicada após a transformação do payload canônico */
   @Column({ type: "jsonb", nullable: true })
   rules?: Record<string, any> | null;
@@ -104,18 +98,24 @@ export class IntegrationInbound {
   // Expressão JSONNata para extração da referência externa (código do cadastro, número do documento, etc) a partir do payload canônico (transformado)
   @Column({ type: "text", nullable: true })
   refExtraction?: string | null;
-
+  
   // Nome do tipo de referência externa (e.g., 'cte', 'cnpj', 'viagem', etc)
   @Column({ type: "varchar", nullable: true })
   refType?: string | null;
-
+  
   // Expressão JSONNata para extração de referências adicionais (e.g., múltiplos códigos relacionados em formato Json) a partir do payload canônico (transformado)
   @Column({ type: "text", nullable: true })
   additionalRefsExtraction?: string | null;
+  
+  /** Modo de roteamento que sobrescreve o modo definido na entidade (integration_entity)
+   * - 'direct': Roteia diretamente para os agentes de destino sem passar pelo ODS
+   * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para os agentes de destino
+   * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para os agentes de destino
+   * - 'default': Usa o modo definido na entidade (integration_entity)
+   */
+  @Column({ type: "varchar", length: 20, nullable: true })
+  overrideRoutingMode?: "default" | "direct" | "ods" | "mdm" | null;
 
-  /** Opções adicionais (reservado para uso futuro) */
-  // @Column({ type: "jsonb", nullable: true })
-  // options?: Record<string, any> | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
