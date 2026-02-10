@@ -70,7 +70,7 @@ export class IntegrationInbound {
    * Ex: Uma integração de pessoa física (people) quando no payload tiver um campo "type" com valor "driver", então a entidade será 'driver' ao invés de 'people'
    * Útil para casos onde o mesmo endpoint de integração recebe chamadas com a mesma combinação de método HTTP e entidade, mas a entidade a ser processada depende do conteúdo do payload.
    */
-  @Column({ type: "jsonb", nullable: true })
+  @Column({ name: "routing_entity", type: "jsonb", nullable: true })
   routingEntity?: IntegrationInboundRouting[];
 
   /** Condições de definição para ações (action) baseadas no payload canônico (transformado).
@@ -79,7 +79,7 @@ export class IntegrationInbound {
    * Ex: Se o payload tiver um campo "operation" com valor "update", então a ação será 'update' ao invés de 'create', mesmo que o método HTTP seja 'POST'.
    * Útil para casos onde o mesmo endpoint de integração recebe chamadas com a mesma combinação de método HTTP e entidade, mas a ação a ser executada depende do conteúdo do payload.
    */
-  @Column({ type: "jsonb", nullable: true })
+  @Column({ name: "routing_action",type: "jsonb", nullable: true })
   routingAction?: IntegrationInboundRouting[];
 
   
@@ -96,15 +96,15 @@ export class IntegrationInbound {
   rules?: Record<string, any> | null;
 
   // Expressão JSONNata para extração da referência externa (código do cadastro, número do documento, etc) a partir do payload canônico (transformado)
-  @Column({ type: "text", nullable: true })
+  @Column({ name: "ref_extraction", type: "text", nullable: true })
   refExtraction?: string | null;
   
   // Nome do tipo de referência externa (e.g., 'cte', 'cnpj', 'viagem', etc)
-  @Column({ type: "varchar", nullable: true })
+  @Column({ name: "ref_type", type: "varchar", nullable: true })
   refType?: string | null;
   
   // Expressão JSONNata para extração de referências adicionais (e.g., múltiplos códigos relacionados em formato Json) a partir do payload canônico (transformado)
-  @Column({ type: "text", nullable: true })
+  @Column({ name: "additional_refs_extraction", type: "text", nullable: true })
   additionalRefsExtraction?: string | null;
   
   /** Modo de roteamento que sobrescreve o modo definido na entidade (integration_entity)
@@ -113,7 +113,7 @@ export class IntegrationInbound {
    * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para os agentes de destino
    * - 'default': Usa o modo definido na entidade (integration_entity)
    */
-  @Column({ type: "varchar", length: 20, nullable: true })
+  @Column({ name: "override_routing_mode", type: "varchar", length: 20, nullable: true })
   overrideRoutingMode?: "default" | "direct" | "ods" | "mdm" | null;
 
 

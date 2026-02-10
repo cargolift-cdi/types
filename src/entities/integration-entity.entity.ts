@@ -10,6 +10,8 @@
  * - O modo de roteamento define como a entidade será processada dentro do middleware (direto, via ODS ou via MDM).
  */
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Schema } from "../interfaces/schema-validation.interface.js";
+import { EntityMetadados } from "../interfaces/entity-metadados.interface.js";
 
 
 @Entity({ name: "integration_entity" })
@@ -38,13 +40,20 @@ export class IntegrationEntity {
   @Column({ type: "varchar", length: 500, nullable: true })
   description?: string | null;
 
+  /** Schema JSON para validação da entidade */
+  @Column({ type: "jsonb", nullable: true })
+  schema?: Schema[] | null;
+
+  @Column({ type: "jsonb", nullable: true })
+  metadados?: EntityMetadados| null;
+
   /**
    * Modo de roteamento da entidade
    * - 'direct': Roteia diretamente para entidades de destino sem passar pelo ODS
    * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para entidades de destino
    * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para entidades de destino
    */
-  @Column({ type: "varchar", length: 20 })
+  @Column({ name: "routing_mode", type: "varchar", length: 20 })
   routingMode!: "direct" | "ods" | "mdm";
 
   /** Opções adicionais (reservado para uso futuro) */
