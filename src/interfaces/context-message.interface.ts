@@ -40,7 +40,7 @@ export interface ContextMessage {
     correlation_id?: string;
     timestamp_start?: string;
     application?: ContextApplication;
-    source: ContextSource;
+    source?: ContextSource;
     trace?: ContextTrace[];
     error?: ContextError;
     warns?: string[];

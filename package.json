@@ -24,6 +24,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
@@ -37,8 +38,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "dev": "tsc -w",
     "build": "npm run clean && tsc -p tsconfig.json",
+    "clean": "",
     "prepublishOnly": "npm run clean && npm run build && npm version patch --no-git-tag-version"
   },
   "engines": {
