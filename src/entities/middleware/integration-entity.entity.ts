@@ -10,8 +10,8 @@
  * - O modo de roteamento define como a entidade será processada dentro do middleware (direto, via ODS ou via MDM).
  */
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Schema } from "../interfaces/schema-validation.interface.js";
-import { EntityMetadados } from "../interfaces/entity-metadados.interface.js";
+import { Schema } from "../../interfaces/schema-validation.interface.js";
+import { EntityMetadata } from "../../interfaces/entity-metadados.interface.js";
 
 
 @Entity({ name: "integration_entity" })
@@ -45,7 +45,7 @@ export class IntegrationEntity {
   schema?: Schema[] | null;
 
   @Column({ type: "jsonb", nullable: true })
-  metadados?: EntityMetadados| null;
+  metadados?: EntityMetadata| null;
 
   /**
    * Modo de roteamento da entidade

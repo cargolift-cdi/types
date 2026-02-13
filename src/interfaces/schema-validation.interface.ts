@@ -7,6 +7,7 @@ export type SchemaFieldType = "string" | "number" | "boolean" | "date" | "object
 export interface Schema {
     type?: SchemaFieldType; // tipo esperado (email é um string com validação de formato)
     required?: boolean;                 // se o campo é obrigatório
+    readonly?: boolean;                 // se o campo é somente leitura
     length?: {
         min?: number;                     // para strings
         max?: number;                     // para strings

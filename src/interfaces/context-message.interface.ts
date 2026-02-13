@@ -1,6 +1,6 @@
-import { LogIntegrationInbound } from "../entities/log-integration-inbound.entity.js";
-import { LogIntegrationOutbound } from "../entities/log-integration-outbound.entity.js";
-import { ErrorSource, ErrorType } from "../index.js";
+import { LogIntegrationInbound } from "../entities/middleware/log-integration-inbound.entity.js";
+import { LogIntegrationOutbound } from "../entities/middleware/log-integration-outbound.entity.js";
+import { ErrorSource, ErrorType, LogMdm } from "../index.js";
 
 export interface ContextApplication {
     name: string;
@@ -46,6 +46,9 @@ export interface ContextMessage {
     warns?: string[];
     inbound?: LogIntegrationInbound;
     outbound?: LogIntegrationOutbound;
+    mdm?: LogMdm;
+    // Valor de referência para correlação de mensagens relacionadas, como um ID de negócio, chave de negócio, chave de entidade, etc.
+    reference_key?: string;
 }
 
 // export type ContextErrorType = 'business' | 'application' | 'none';

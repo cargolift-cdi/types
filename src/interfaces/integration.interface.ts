@@ -1,6 +1,8 @@
 import { HttpMethod } from "../enum/integration.enums.js";
 import { PayloadConditionsValue } from "../interfaces/payload-condition.interface.js";
 
+export type IntegrationActions = "create" | "update" | "upsert" | "delete" | "clean" | "view";
+
 
 
 export interface ResponseInterpreterSuccessCondition {

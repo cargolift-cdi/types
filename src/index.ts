@@ -17,17 +17,19 @@ export * from './interfaces/schema-validation.interface.js';
 export * from './interfaces/entity-metadados.interface.js';
 
 // Entidades
-export * from './entities/integration-agent.entity.js';
-export * from './entities/integration-entity.entity.js';
-export * from './entities/integration-inbound.entity.js';
-export * from './entities/integration-outbound.entity.js';
-export * from './entities/integration-endpoint.entity.js';
-export * from './entities/integration-credential.entity.js';
-export * from './entities/diagnostic-latency.entity.js';
-export * from './entities/log-integration-inbound.entity.js';
-export * from './entities/log-integration-outbound.entity.js';
+export * from './entities/middleware/integration-agent.entity.js';
+export * from './entities/middleware/integration-entity.entity.js';
+export * from './entities/middleware/integration-inbound.entity.js';
+export * from './entities/middleware/integration-outbound.entity.js';
+export * from './entities/middleware/integration-endpoint.entity.js';
+export * from './entities/middleware/integration-credential.entity.js';
+export * from './entities/middleware/diagnostic-latency.entity.js';
+export * from './entities/middleware/log-integration-inbound.entity.js';
+export * from './entities/middleware/log-integration-outbound.entity.js';
+export * from './entities/middleware/log-mdm.entity.js';
 
-
+// MDM
+export * from './entities/mdm/mdm-driver.entity.js';
 
 // Enum
 export * from './enum/integration.enums.js';

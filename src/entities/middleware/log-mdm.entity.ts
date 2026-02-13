@@ -6,21 +6,21 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { IntegrationStatus } from "../enum/integration.enums.js";
-import { ErrorSource, ErrorType } from "../enum/error-type.enum.js";
+import { IntegrationStatus } from "../../enum/integration.enums.js";
+import { ErrorSource, ErrorType } from "../../enum/error-type.enum.js";
 
 
 /**
  * Mantém o histórico de chamadas de integração de entrada (inbound).
  * Armazena o request e response para auditoria e troubleshooting.
  */
-@Entity({ name: "log_integration_inbound" })
+@Entity({ name: "log_mdm" })
 @Index(["id"], { unique: true })
 @Index(["correlationId"], { unique: true })
 @Index(["agent", "entity", "action"])
 @Index(["status", "updatedAt"])
 @Index(["agent", "entity", "updatedAt"])
-export class LogIntegrationOutbound {
+export class LogMdm {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
@@ -35,28 +35,41 @@ export class LogIntegrationOutbound {
   /** Ação (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
   action!: string;
-
+  
   /** Correlation Id */
   @Column({ name: "correlation_id", type: "varchar", length: 36 })
   correlationId!: string;
 
-  /** Timestamp de início da requisição na API */
-  @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
-  timestampStart?: Date | string;
+  /** Business Key */
+  @Column({ name: "business_key", type: "varchar", length: 140, nullable: true })
+  businessKey?: string;  
   
-  /** Timestamp do início do processamento no ESB */
-  @Column({ name: "timestamp_process", type: "timestamptz", nullable: true })
-  timestampProcess?: Date | null;  
+  /** Timestamp de início de origem da requisição na API */
+  @Column({ name: "timestamp_origin_start", type: "timestamptz", nullable: true })
+  timestampOriginStart?: Date | string;
+  
+  /** Timestamp do início do processamento  */
+  @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
+  timestampStart?: Date | null;  
 
-  /** Timestamp final do processamento no ESB */
+  /** Timestamp final do processamento  */
   @Column({ name: "timestamp_end", type: "timestamptz", nullable: true })
   timestampEnd?: Date | null;
+
+
+
+
+  /** Mensagens de avisos e alertas não críticas */
+  @Column({ type: 'text', nullable: true })
+  warns?: string | null;
+
+  
 
   /** Duração total em milissegundos */
   @Column({ name: "duration_request_ms", type: "int", nullable: true })
   durationRequest?: number | null;  
 
-  /** Duração do processamento em milissegundos no ESB */
+  /** Duração do processamento em milissegundos */
   @Column({ name: "duration_process_ms", type: "int", nullable: true })
   durationProcessMs?: number | null;
 

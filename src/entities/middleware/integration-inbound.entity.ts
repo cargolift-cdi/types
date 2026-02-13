@@ -14,8 +14,7 @@
 
  */
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { IntegrationInboundRouting } from "../interfaces/integration.interface.js";
-import { IntegrationActions } from "../enum/integration.enums.js";
+import { IntegrationActions, IntegrationInboundRouting } from "../../interfaces/integration.interface.js";
 
 /**
  * Perfil de rotas de integração de entrada (inbound) para validação, transformação e roteamento.
