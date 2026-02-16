@@ -13,20 +13,24 @@ export class MdmDriver {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
+  /** CPF do motorista (somente números, sem formatação) */
+  @Column({ type: "varchar", length: 11 })
+  cpf!: string;
+  
   /** Nome completo do motorista */
   @Column({ type: "varchar", length: 255 })
   name!: string;
 
-  /** CPF do motorista (somente números, sem formatação) */
-  @Column({ type: "varchar", length: 11 })
-  cpf!: string;
+  /** Cidade */
+  @Column({ type: "varchar", length: 100, nullable: true })
+  city!: string;
 
   /** Número da CNH do motorista */
-  @Column({ type: "varchar", length: 20 })
+  @Column({ type: "varchar", length: 20, nullable: true })
   cnhNumber!: string;
 
   /** Categoria da CNH (ex: A, B, C, D, E) */
-  @Column({ type: "varchar", length: 2 })
+  @Column({ type: "varchar", length: 2, nullable: true })
   cnhCategory!: string;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })

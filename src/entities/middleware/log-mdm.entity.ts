@@ -32,17 +32,24 @@ export class LogMdm {
   @Column({ type: "varchar", length: 80 })
   entity!: string;
 
-  /** Ação (e.g., 'create', 'update', 'delete', etc) */
+  /** Ação (e.g., 'upsert', 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
   action!: string;
+  
+  /** Operação CRUD  (e.g., 'create', 'update', 'delete', etc) */
+  @Column({ type: "varchar", length: 40 })
+  operation!: string;
   
   /** Correlation Id */
   @Column({ name: "correlation_id", type: "varchar", length: 36 })
   correlationId!: string;
 
+  @Column({ name: "record_id", type: "varchar", length: 100, nullable: true })
+  recordId?: string | undefined; // ID do registro afetado (opcional, pode ser preenchido posteriormente para facilitar buscas)
+
   /** Business Key */
   @Column({ name: "business_key", type: "varchar", length: 140, nullable: true })
-  businessKey?: string;  
+  businessKey?: string | undefined;  
   
   /** Timestamp de início de origem da requisição na API */
   @Column({ name: "timestamp_origin_start", type: "timestamptz", nullable: true })
@@ -101,15 +108,15 @@ export class LogMdm {
   @Column({ type: 'text', nullable: true })
   payload?: string | null;
 
-  /** Payload transformado em formato canônico após aplicação da transformação JSONata */
+  /** Payload após a aplicação das permissões, remoção de campos sem permissão*/
   @Column({ type: 'text', nullable: true })
-  transformedPayload?: string | null;
-
-  /** Payload após enriquecimento de regras do BRE */
+  filteredPayload?: string | null;
+  
+  /** Payload após sanitização, removendo campos sem alteração */
   @Column({ type: 'text', nullable: true })
-  enrichedPayload?: string | null;
+  sanitizedPayload?: string | null;
 
-  /** Mensagem completa do erro */
+  /** Resposta recebida do sistema de destino */  /** Mensagem completa do erro */
   @Column({ type: 'text', nullable: true })
   errorMessage?: string | null;
 

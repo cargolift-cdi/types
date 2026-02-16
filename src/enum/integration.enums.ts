@@ -37,7 +37,7 @@ export enum IntegrationStatus {
   SUCCESS = 'success',
   FAILED = 'failed',
   RETRYING = 'retrying',
-  DISCARDED = 'discarded'
+  DISCARTED = 'discarted'
 }
 
 
