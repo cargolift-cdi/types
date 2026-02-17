@@ -5,6 +5,7 @@ export type IntegrationActions = "create" | "update" | "upsert" | "delete" | "cl
 
 
 
+
 export interface ResponseInterpreterSuccessCondition {
   path: string;
   equals?: string | number | boolean | null;

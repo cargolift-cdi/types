@@ -4,7 +4,15 @@
  * @author Israel A. Possoli
  * @date 2026-02-12
  */
-import { Column, Entity, PrimaryGeneratedColumn, Index, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from "typeorm";
 
 @Entity({ name: "driver" })
 @Index(["cpf"], { unique: true })
@@ -16,7 +24,7 @@ export class MdmDriver {
   /** CPF do motorista (somente números, sem formatação) */
   @Column({ type: "varchar", length: 11 })
   cpf!: string;
-  
+
   /** Nome completo do motorista */
   @Column({ type: "varchar", length: 255 })
   name!: string;
@@ -37,5 +45,9 @@ export class MdmDriver {
   createdAt!: Date;
 
   @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
-  updatedAt!: Date;  
+  updatedAt!: Date;
+
+  /** Timestamp de exclusão lógica (soft delete) */
+  @DeleteDateColumn({ name: "deleted_at", type: "timestamptz", nullable: true })
+  deletedAt?: Date | null;
 }
