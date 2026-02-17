@@ -1,14 +1,6 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { IntegrationStatus } from "../../enum/integration.enums.js";
 import { ErrorSource, ErrorType } from "../../enum/error-type.enum.js";
-
 
 /**
  * Mantém o histórico de chamadas de integração de entrada (inbound).
@@ -35,11 +27,11 @@ export class LogMdm {
   /** Ação (e.g., 'upsert', 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
   action!: string;
-  
+
   /** Operação CRUD  (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
   operation!: string;
-  
+
   /** Correlation Id */
   @Column({ name: "correlation_id", type: "varchar", length: 36 })
   correlationId!: string;
@@ -49,96 +41,95 @@ export class LogMdm {
 
   /** Business Key */
   @Column({ name: "business_key", type: "varchar", length: 140, nullable: true })
-  businessKey?: string | undefined;  
-  
-  /** Timestamp de início de origem da requisição na API */
+  businessKey?: string | undefined;
+
+  /** Status final do processamento */
+  @Column({ type: "varchar", length: 10, nullable: false })
+  status!: IntegrationStatus;
+
+  /** Motivo do status (mensagem curta) */
+  @Column({ type: "varchar", length: 255, nullable: true })
+  statusReason?: string | null;
+
+  /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
+  @Column({ type: "int", nullable: true })
+  retries?: number | null;
+
+  /** Timestamp de início de origem onde a mensagem/requisição foi gerada */
   @Column({ name: "timestamp_origin_start", type: "timestamptz", nullable: true })
   timestampOriginStart?: Date | string;
-  
+
   /** Timestamp do início do processamento  */
   @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
-  timestampStart?: Date | null;  
+  timestampStart?: Date | null;
+
+  /** Timestamp da última tentativa do processamento  */
+  @Column({ name: "timestamp_last_attempt", type: "timestamptz", nullable: true })
+  timestampLastAttempt?: Date | null;
 
   /** Timestamp final do processamento  */
   @Column({ name: "timestamp_end", type: "timestamptz", nullable: true })
   timestampEnd?: Date | null;
 
-
-
-
-  /** Mensagens de avisos e alertas não críticas */
-  @Column({ type: 'text', nullable: true })
-  warns?: string | null;
-
-  
-
-  /** Duração total em milissegundos */
-  @Column({ name: "duration_request_ms", type: "int", nullable: true })
-  durationRequest?: number | null;  
-
-  /** Duração do processamento em milissegundos */
-  @Column({ name: "duration_process_ms", type: "int", nullable: true })
-  durationProcessMs?: number | null;
-
-  /** Duração total em milissegundos */
+  /** Duração de processamento (único) em milissegundos */
   @Column({ name: "duration_ms", type: "int", nullable: true })
-  durationMs?: number | null;  
+  durationMs?: number | null;
+  
+  /** Duração total que a mensagem levou para ser processada */
+  @Column({ name: "duration_total_ms", type: "int", nullable: true })
+  durationTotal?: number | null;
+  
+  /** Duração total do ciclo de vida end-to-end em milissegundos */
+  @Column({ name: "duration_lifetime_ms", type: "int", nullable: true })
+  durationLifetime?: number | null;
 
-  /** Status final do processamento */
-  @Column({ type: 'varchar', length: 10, nullable: false })
-  status!: IntegrationStatus;
-
-  /** Motivo do status (mensagem curta) */
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  statusReason?: string | null;
-
-  /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
-  @Column({ type: 'int', nullable: true })
-  retries?: number | null;  
+  /** Mensagens de avisos e alertas não críticas que ocorreram durante o ciclo de vida da mensagem dentro do MDM */
+  @Column({ type: "text", nullable: true })
+  warns?: string | null;  
 
   /** Cabeçalhos enviados ao destino após sanitização */
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: "text", nullable: true })
   headers?: string | null;
 
   /** Envelope da requisição */
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: "text", nullable: true })
   envelope?: string | null;
 
-  /** Corpo sanitizado da requisição sem o envelope */
-  @Column({ type: 'text', nullable: true })
+  /** paylaod final após todos os tratamentos (autorização, delta, etc) */
+  @Column({ type: "text", nullable: true })
   payload?: string | null;
 
-  /** Payload após a aplicação das permissões, remoção de campos sem permissão*/
-  @Column({ type: 'text', nullable: true })
-  filteredPayload?: string | null;
-  
-  /** Payload após sanitização, removendo campos sem alteração */
-  @Column({ type: 'text', nullable: true })
-  sanitizedPayload?: string | null;
+  /** Payload da message queue após passar pelo ESB */
+  @Column({ type: "text", nullable: true })
+  rawPayload?: string | null;
 
-  /** Resposta recebida do sistema de destino */  /** Mensagem completa do erro */
-  @Column({ type: 'text', nullable: true })
+  /** Payload após a aplicação das permissões, remoção de campos sem permissão*/
+  @Column({ type: "text", nullable: true })
+  authorizedPayload?: string | null;
+
+  /** Apenas campos modificados que sofreram alterações (update) */
+  @Column({ type: "text", nullable: true })
+  deltaPayload?: string | null;
+
+  /** Resposta do TypeORM após a operação */
+  @Column({ type: "text", nullable: true })
+  operationResult?: string | null;
+
+  /** Resposta recebida do sistema de destino */ /** Mensagem completa do erro */
+  @Column({ type: "text", nullable: true })
   errorMessage?: string | null;
 
   /** Stack completo quando disponível (mantido para investigações) */
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: "text", nullable: true })
   errorStack?: string | null;
 
   /** Classificação do erro  */
-  @Column({ type: 'varchar', length: 15, nullable: true })
+  @Column({ type: "varchar", length: 15, nullable: true })
   errorType?: ErrorType | null;
 
   /** Agente causador do erro */
-  @Column({ type: 'varchar', length: 15, nullable: true })
+  @Column({ type: "varchar", length: 15, nullable: true })
   errorSource?: ErrorSource | null;
-
-  /** Indica se este log veio de um replay manual ou DLQ */
-  // @Column({ type: 'boolean', default: false })
-  // wasReplayedFromDlq!: boolean;  
-
-  /** ID da tabela integration_inbound */
-  @Column({ type: 'bigint', nullable: true  })
-  inboundId!: string; // manter string no TS para bigint seguro
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
