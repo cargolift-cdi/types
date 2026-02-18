@@ -16,14 +16,20 @@ export interface ContextTrace {
   timestamp: string;
 }
 
+export interface ContextIdentityRef {
+  id?: string;
+  username?: string;
+  email?: string;
+}
+
 export interface ContextSource {
   ip?: string;
   user_agent?: string;
-  client?: string;
+  subject?: string;
+  audience?: string;
   application?: string;
-  user_name?: string;
-  user_id?: string;
-  user_email?: string;
+  authentication?: ContextIdentityRef
+  actor?: ContextIdentityRef;
 }
 
 export interface ContextError {
@@ -48,7 +54,7 @@ export interface ContextMessage {
     mdm?: LogMdm;
   };
   // Valor de referência para correlação de mensagens relacionadas, como um ID de negócio, chave de negócio, chave de entidade, etc.
-  reference_key?: string;
+  reference_key?: Record<string, any>;
 }
 
 // export type ContextErrorType = 'business' | 'application' | 'none';

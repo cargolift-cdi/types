@@ -5,7 +5,7 @@
  * @remarks
  * - Registra configurações não sensíveis em `config`.
  * - Armazena segredos sensíveis em `secrets` (campo não selecionado por padrão).
- * - Referencie este registro pela sua `id` (ex.: `credentialId` em IntegrationOutbound).
+ * - Referencie este registro pela sua `id` (ex.: `credentialId` em RoutingOutbound).
  * - Entidade mapeada para a tabela "integration_credential".
  *
  * Campos:
@@ -29,7 +29,7 @@
  * - Implemente rotação periódica e registre `rotation.rotatedAt` / `rotation.expiresAt` quando aplicável.
  *
  *
- * @see IntegrationOutbound - referenciar credenciais por credentialId
+ * @see RoutingOutbound - referenciar credenciais por credentialId
  */
 import {
   Column,
@@ -45,7 +45,7 @@ import { Credential, CredentialSecrets } from '../../interfaces/integration.inte
 
 /**
  * Perfil de credenciais reutilizáveis para autenticação (API Key, Basic, Bearer, OAuth2).
- * Utilize credentialId no IntegrationOutbound para referenciar estas credenciais.
+ * Utilize credentialId no RoutingOutbound para referenciar estas credenciais.
  */
 @Entity({ name: 'integration_credential' })
 @Index(['name'], { unique: true })

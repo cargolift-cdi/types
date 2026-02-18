@@ -6,12 +6,11 @@ import { Schema } from "./schema-validation.interface.js";
  * Define propriedades de metadados para uma entidade e seus campos.
 */
 export interface EntityMetadata {
-    storage: {
-        table: string;          // Nome da tabela ou coleção onde a entidade é armazenada,
+    entity: {
         primaryKey: string[];   // Campos que compõem a chave primária da entidade (ex: ["id"] ou ["country", "code"])
         businessKey?: string[]; // Campos que compõem a chave de negócio (
     }
-    globalPermissions?: PermissionRules[];  // Permissões globais para toda a entidade quando nenhuma regra específica de campo for atendida
+    globalFieldPermissions?: PermissionRules[];  // Permissões globais para toda a entidade quando nenhuma regra específica de campo for atendida
     fields?: FieldMetadata[];              // Regras de acesso específicas por campo
 }
 

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Entidade IntegrationOutbound - Define configurações de integração de saída (outbound)
+ * @fileoverview Entidade RoutingOutbound - Define configurações de integração de saída (outbound)
  * @author Israel A. Possoli
  * @date 2026-01-06 * 
 

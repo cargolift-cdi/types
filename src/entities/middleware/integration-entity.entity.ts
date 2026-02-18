@@ -40,9 +40,11 @@ export class IntegrationEntity {
   @Column({ type: "varchar", length: 500, nullable: true })
   description?: string | null;
 
-  /** Schema JSON para validação da entidade */
-  @Column({ type: "jsonb", nullable: true })
-  schema?: Schema[] | null;
+  /** Schema JSON para o formato canônico para validação da entidade 
+   * Validado nos serviços de ODS ou MDM antes do roteamento para os agentes de destino.
+  */
+  // @Column({ type: "jsonb", nullable: true })
+  //schema?: Schema[] | null;
 
   @Column({ type: "jsonb", nullable: true })
   metadados?: EntityMetadata| null;

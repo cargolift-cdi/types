@@ -58,7 +58,7 @@ export class LogIntegrationInbound {
    * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para agentes de destino
    * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para agentes de destino
    */
-  @Column({ type: "varchar", length: 20, nullable: true })
+  @Column({ name: "routing_mode", type: "varchar", length: 20, nullable: true })
   routingMode?: string | null;  
 
   /** Status final do processamento */
@@ -66,11 +66,11 @@ export class LogIntegrationInbound {
   status!: IntegrationStatus;
 
   /** Motivo do status (mensagem curta) */
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ name: "status_reason", type: 'varchar', length: 255, nullable: true })
   statusReason?: string | null;
 
   /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
-  @Column({ type: 'int', nullable: true })
+  @Column({ name: "retries", type: 'int', nullable: true })
   retries?: number | null;  
 
   /** Timestamp de início de origem onde a mensagem/requisição foi gerada */
@@ -102,74 +102,62 @@ export class LogIntegrationInbound {
   durationLifetime?: number | null;
   
   /** Mensagens de avisos e alertas não críticas */
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: "warns", type: 'text', nullable: true })
   warns?: string | null;
 
   /** Cabeçalhos do message broker (RabbitMQ) */
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: "headers", type: 'text', nullable: true })
   headers?: string | null;
 
 
   /** Envelope da requisição */
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: "envelope", type: 'text', nullable: true })
   envelope?: string | null;
 
   /** Payload final após todos os tratamentos (transformações, enriquecimentos, etc) */
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: "payload", type: 'text', nullable: true })
   payload?: string | null;
 
   /** Corpo bruto da requisição recebido */
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: "raw_payload", type: 'text', nullable: true })
   rawPayload?: string | null;     
 
   /** Payload transformado em formato canônico após aplicação da transformação JSONata */
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: "transformed_payload", type: 'text', nullable: true })
   transformedPayload?: string | null;
 
   /** Payload após enriquecimento de regras do BRE */
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: "enriched_payload", type: 'text', nullable: true })
   enrichedPayload?: string | null;
 
   /** Mensagem completa do erro */
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: "error_message", type: 'text', nullable: true })
   errorMessage?: string | null;
 
   /** Stack completo quando disponível (mantido para investigações) */
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: "error_stack", type: 'text', nullable: true })
   errorStack?: string | null;
 
   /** Classificação do erro  */
-  @Column({ type: 'varchar', length: 15, nullable: true })
+  @Column({ name: "error_type", type: 'varchar', length: 15, nullable: true })
   errorType?: ErrorType | null;
 
   /** Agente causador do erro */
-  @Column({ type: 'varchar', length: 15, nullable: true })
+  @Column({ name: "error_source", type: 'varchar', length: 15, nullable: true })
   errorSource?: ErrorSource | null;
 
 
-  /** Indica se este log veio de um replay manual ou DLQ */
-  // @Column({ type: 'boolean', default: false })
-  // wasReplayedFromDlq!: boolean;  
-
-  // Referência externa associada (código do cadastro, número do documento, etc)
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  externalReference?: string | null;
-
-  // Tipo da referência externa ('cpf', 'número do cte', etc)
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  externalReferenceType?: string | null;
-
   /**
-   * Referências externas adicionais associadas em formato JSON (e.g., múltiplos códigos relacionados)
+   * Referências externas associadas a mensagem/requisição para facilitar buscas e correlações (e.g., número de CTE, número de NF-e, CNPJ, etc).
    * Formato: Chave-Valor (Tipo-Referência)
    * Exemplo: { "cte": "000123", "cnpj": "12345678000199" }
    */
   // TODO: Criar migration para índice GIN
-  @Column({ type: 'jsonb', nullable: true })
-  additionalExternalReferences?: Record<string, any> | null;
+  @Column({ name: "external_reference", type: 'jsonb', nullable: true })
+  externalReference?: Record<string, any> | null;
 
-  /** ID da tabela integration_inbound */
-  @Column({ type: 'bigint', nullable: true  })
+  /** ID da tabela routing_inbound */
+  @Column({ name: "inbound_id", type: 'bigint', nullable: true  })
   inboundId!: string; // manter string no TS para bigint seguro
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })

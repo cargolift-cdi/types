@@ -40,8 +40,8 @@ export class LogMdm {
   recordId?: string | undefined; // ID do registro afetado (opcional, pode ser preenchido posteriormente para facilitar buscas)
 
   /** Business Key */
-  @Column({ name: "business_key", type: "varchar", length: 140, nullable: true })
-  businessKey?: string | undefined;
+  @Column({ name: "business_key", type: "jsonb", nullable: true })
+  businessKey?: Record<string, any> | null;
 
   /** Status final do processamento */
   @Column({ type: "varchar", length: 10, nullable: false })

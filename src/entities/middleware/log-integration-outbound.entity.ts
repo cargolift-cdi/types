@@ -127,7 +127,7 @@ export class LogIntegrationOutbound {
   // @Column({ type: 'boolean', default: false })
   // wasReplayedFromDlq!: boolean;  
 
-  /** ID da tabela integration_inbound */
+  /** ID da tabela routing_inbound */
   @Column({ type: 'bigint', nullable: true  })
   inboundId!: string; // manter string no TS para bigint seguro
 

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Entidade IntegrationInbound - Define configurações de integração de entrada (inbound)
+ * @fileoverview Entidade RoutingInbound - Define configurações de integração de entrada (inbound)
  * @author Israel A. Possoli
  * @date 2026-01-06 
  * Representa uma rota de integração de entrada (inbound) que descreve como entidades externas (o que está sendo integrado)
@@ -20,13 +20,13 @@ import { IntegrationActions, IntegrationInboundRouting } from "../../interfaces/
  * Perfil de rotas de integração de entrada (inbound) para validação, transformação e roteamento.
  * Utilize agent + entity + action no IntegrationEntity para referenciar estas rotas.
  */
-@Entity({ name: "integration_inbound" })
+@Entity({ name: "routing_inbound" })
 @Index(["agent", "entity", "action", "version"], { unique: true })
-@Index("uq_integration_inbound_active", ["agent", "entity", "action"], {
+@Index("uq_routing_inbound_active", ["agent", "entity", "action"], {
   unique: true,
   where: `"active" = true`,
 })
-export class IntegrationInbound {
+export class RoutingInbound {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
@@ -94,17 +94,10 @@ export class IntegrationInbound {
   @Column({ type: "jsonb", nullable: true })
   rules?: Record<string, any> | null;
 
-  // Expressão JSONNata para extração da referência externa (código do cadastro, número do documento, etc) a partir do payload canônico (transformado)
+  
+  // Expressão JSONNata para extração de referências a partir do payload canônico (transformado) que serão armazenadas no campo 'external_reference' para facilitar buscas, correlações e auditorias.
   @Column({ name: "ref_extraction", type: "text", nullable: true })
   refExtraction?: string | null;
-  
-  // Nome do tipo de referência externa (e.g., 'cte', 'cnpj', 'viagem', etc)
-  @Column({ name: "ref_type", type: "varchar", nullable: true })
-  refType?: string | null;
-  
-  // Expressão JSONNata para extração de referências adicionais (e.g., múltiplos códigos relacionados em formato Json) a partir do payload canônico (transformado)
-  @Column({ name: "additional_refs_extraction", type: "text", nullable: true })
-  additionalRefsExtraction?: string | null;
   
   /** Modo de roteamento que sobrescreve o modo definido na entidade (integration_entity)
    * - 'direct': Roteia diretamente para os agentes de destino sem passar pelo ODS
