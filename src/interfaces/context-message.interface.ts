@@ -1,5 +1,5 @@
-import { LogIntegrationInbound } from "../entities/middleware/log-integration-inbound.entity.js";
-import { LogIntegrationOutbound } from "../entities/middleware/log-integration-outbound.entity.js";
+import { LogRoutingInbound } from "../entities/middleware/log-routing-inbound.entity.js";
+import { LogRoutingOutbound } from "../entities/middleware/log-integration-outbound.entity.js";
 import { ErrorSource, ErrorType, LogMdm } from "../index.js";
 
 export interface ContextApplication {
@@ -49,12 +49,13 @@ export interface ContextMessage {
   error?: ContextError;
   warns?: string[];
   log?: {
-    inbound?: LogIntegrationInbound;
-    outbound?: LogIntegrationOutbound;
+    inbound?: LogRoutingInbound;
+    outbound?: LogRoutingOutbound;
     mdm?: LogMdm;
   };
   // Valor de referência para correlação de mensagens relacionadas, como um ID de negócio, chave de negócio, chave de entidade, etc.
-  reference_key?: Record<string, any>;
+  external_reference?: Record<string, any>;
+  business_key?: Record<string, any>;
 }
 
 // export type ContextErrorType = 'business' | 'application' | 'none';

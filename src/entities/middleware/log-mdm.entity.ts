@@ -43,6 +43,13 @@ export class LogMdm {
   @Column({ name: "business_key", type: "jsonb", nullable: true })
   businessKey?: Record<string, any> | null;
 
+  /** Referências externas associadas a mensagem/requisição para facilitar buscas e correlações (e.g., número de CTE, número de NF-e, CNPJ, etc).
+   * Formato: Chave-Valor (Tipo-Referência)
+   * Exemplo: { "cte": "000123", "cnpj": "12345678000199" }
+   */
+  @Column({ name: "external_reference", type: "jsonb", nullable: true })
+  externalReference?: Record<string, any> | null;
+
   /** Status final do processamento */
   @Column({ type: "varchar", length: 10, nullable: false })
   status!: IntegrationStatus;

@@ -11,16 +11,16 @@ import { ErrorSource, ErrorType } from "../../enum/error-type.enum.js";
 
 
 /**
- * Mantém o histórico de chamadas de integração de entrada (inbound).
+ * Mantém o histórico de chamadas de integração de saída (outbound).
  * Armazena o request e response para auditoria e troubleshooting.
  */
-@Entity({ name: "log_integration_inbound" })
+@Entity({ name: "log_routing_outbound" })
 @Index(["id"], { unique: true })
 @Index(["correlationId"], { unique: true })
 @Index(["agent", "entity", "action"])
 @Index(["status", "updatedAt"])
 @Index(["agent", "entity", "updatedAt"])
-export class LogIntegrationOutbound {
+export class LogRoutingOutbound {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 

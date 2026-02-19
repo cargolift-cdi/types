@@ -27,7 +27,7 @@ export * from './entities/middleware/routing-outbound.entity.js';
 export * from './entities/middleware/integration-endpoint.entity.js';
 export * from './entities/middleware/integration-credential.entity.js';
 export * from './entities/middleware/diagnostic-latency.entity.js';
-export * from './entities/middleware/log-integration-inbound.entity.js';
+export * from './entities/middleware/log-routing-inbound.entity.js';
 export * from './entities/middleware/log-integration-outbound.entity.js';
 export * from './entities/middleware/log-mdm.entity.js';
 

@@ -94,10 +94,11 @@ export class RoutingInbound {
   @Column({ type: "jsonb", nullable: true })
   rules?: Record<string, any> | null;
 
-  
-  // Expressão JSONNata para extração de referências a partir do payload canônico (transformado) que serão armazenadas no campo 'external_reference' para facilitar buscas, correlações e auditorias.
-  @Column({ name: "ref_extraction", type: "text", nullable: true })
-  refExtraction?: string | null;
+ 
+  // Expressão JSONNata para extração de referências a partir do payload original (antes da transformação para o formato canônico)
+  // Será armazenadas no campo 'external_reference' do log_routing_inbound para facilitar buscas, correlações e auditorias.
+  @Column({ name: "external_reference_extraction", type: "text", nullable: true })
+  externalReferenceExtraction?: string | null;
   
   /** Modo de roteamento que sobrescreve o modo definido na entidade (integration_entity)
    * - 'direct': Roteia diretamente para os agentes de destino sem passar pelo ODS

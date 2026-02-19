@@ -26,8 +26,8 @@ export class IntegrationAgent {
   @Column({ type: 'boolean', default: true })
   active!: boolean;
 
-  // Nome do usuário (clientId) no KeyCloak para consumir API do middleware
-  @Column({ type: 'varchar', length: 80, nullable: true })
+  /** Nome do usuário (clientId) no KeyCloak para consumir API do middleware */
+  @Column({ name: "api_client_id", type: 'varchar', length: 80, nullable: true })
   apiClientId?: string;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
