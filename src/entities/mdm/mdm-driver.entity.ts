@@ -8,15 +8,13 @@ import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
-  Index,
-  CreateDateColumn,
-  UpdateDateColumn,
-  DeleteDateColumn,
+  Index
 } from "typeorm";
+import { MdmBase } from "./mdm-base.entity.js";
 
 @Entity({ name: "driver" })
 @Index(["cpf"], { unique: true })
-export class MdmDriver {
+export class MdmDriver extends MdmBase {
   /** Identificador único do motorista */
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
@@ -40,14 +38,4 @@ export class MdmDriver {
   /** Categoria da CNH (ex: A, B, C, D, E) */
   @Column({ type: "varchar", length: 2, nullable: true })
   cnhCategory!: string;
-
-  @CreateDateColumn({ name: "created_at", type: "timestamptz" })
-  createdAt!: Date;
-
-  @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
-  updatedAt!: Date;
-
-  /** Timestamp de exclusão lógica (soft delete) */
-  @DeleteDateColumn({ name: "deleted_at", type: "timestamptz", nullable: true })
-  deletedAt?: Date | null;
 }

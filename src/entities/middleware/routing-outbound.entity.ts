@@ -75,6 +75,10 @@ export class RoutingOutbound {
   @Column({ type: "text", nullable: true })
   transformation?: string | null;  
 
+  /** Dependência de outras rotas para o mesmo agent e entidade */
+  @Column({ type: "jsonb", default: () => "'{}'::jsonb", nullable: true })
+  dependencies?: Record<string, any> | null;
+
   /** Opções adicionais (reservado para uso futuro) */
   // @Column({ type: "jsonb", nullable: true })
   // options?: Record<string, any> | null;

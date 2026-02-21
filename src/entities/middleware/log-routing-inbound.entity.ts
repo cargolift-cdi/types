@@ -23,10 +23,14 @@ export class LogRoutingInbound {
 
   /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
   @Column({ type: "varchar", length: 80 })
-  entity!: string;
+  endpoint!: string;
 
   @Column({ type: "varchar", length: 80 })
   method!: string;
+
+  /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
+  @Column({ type: "varchar", length: 80 })
+  entity!: string;
 
   /** Ação (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
@@ -35,14 +39,6 @@ export class LogRoutingInbound {
   /** Correlation Id */
   @Column({ name: "correlation_id", type: "varchar", length: 36 })
   correlationId!: string;
-
-  /** Entidade de origem (antes do roteamento) (e.g., 'driver' or 'driver.created') */
-  @Column({ type: "varchar", length: 80, nullable: true })
-  sourceEntity?: string | null;
-
-  /** Ação de origem (antes do roteamento) (e.g., 'create', 'update', 'delete', etc) */
-  @Column({ type: "varchar", length: 40, nullable: true })
-  sourceAction?: string | null;
 
   /** Business Key */
   @Column({ name: "business_key", type: "jsonb", nullable: true })
@@ -153,6 +149,10 @@ export class LogRoutingInbound {
   /** ID da tabela routing_inbound */
   @Column({ name: "inbound_id", type: "bigint", nullable: true })
   inboundId!: string; // manter string no TS para bigint seguro
+
+  /** Detalhes adicionais */
+  @Column({ name: "details", type: "jsonb", nullable: true })
+  details?: Record<string, any> | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;

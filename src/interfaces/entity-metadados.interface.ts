@@ -10,7 +10,6 @@ export interface EntityMetadata {
         primaryKey: string[];   // Campos que compõem a chave primária da entidade (ex: ["id"] ou ["country", "code"])
         businessKey?: string[]; // Campos que compõem a chave de negócio
         permissions?: PermissionRules[];    // Lista de permissões para este campo
-
     }
     globalFieldPermissions?: PermissionRules[];  // Permissões globais para toda a entidade quando nenhuma regra específica de campo for atendida
     fields?: FieldMetadata[];              // Regras de acesso específicas por campo

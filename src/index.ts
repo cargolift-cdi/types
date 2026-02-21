@@ -32,6 +32,7 @@ export * from './entities/middleware/log-integration-outbound.entity.js';
 export * from './entities/middleware/log-mdm.entity.js';
 
 // MDM
+export * from './entities/mdm/mdm-base.entity.js';
 export * from './entities/mdm/mdm-driver.entity.js';
 export * from './entities/shared/audit-trail.entity.js';
 

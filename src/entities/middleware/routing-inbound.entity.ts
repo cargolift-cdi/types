@@ -6,8 +6,8 @@
  * devem ser validados, transformados e aplicados às regras globais antes do roteamento dentro do ESB para o MDM, ODS ou agentes de destino.
  *
  * @remarks
- * - Cada combinação (agent, entity, action, version) é única.
- * - Apenas uma versão por (agent, entity, action) pode estar ativa ao mesmo tempo.
+ * - Cada combinação (agent, endpoint, method, version) é única.
+ * - Apenas uma versão por (agent, endpoint, method) pode estar ativa ao mesmo tempo.
  * - Versões anteriores devem ser imutáveis após a publicação de novas versões.
  * - Transformações usam expressões JSONata para mapear payloads externos ao formato canônico interno.
  *
@@ -15,14 +15,15 @@
  */
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { IntegrationActions, IntegrationInboundRouting } from "../../interfaces/integration.interface.js";
+import { SchemaValidation } from "../../interfaces/schema-validation.interface.js";
 
 /**
  * Perfil de rotas de integração de entrada (inbound) para validação, transformação e roteamento.
- * Utilize agent + entity + action no IntegrationEntity para referenciar estas rotas.
+ * Utilize agent + endpoint + method no IntegrationEntity para referenciar estas rotas.
  */
 @Entity({ name: "routing_inbound" })
-@Index(["agent", "entity", "action", "version"], { unique: true })
-@Index("uq_routing_inbound_active", ["agent", "entity", "action"], {
+@Index(["agent", "endpoint", "method", "version"], { unique: true })
+@Index("uq_routing_inbound_active", ["agent", "endpoint", "method"], {
   unique: true,
   where: `"active" = true`,
 })
@@ -34,9 +35,9 @@ export class RoutingInbound {
   @Column({ type: "varchar", length: 80 })
   agent!: string;
 
-  /** Entidade - Representa o que está sendo integrado. (e.g., 'driver', 'cte', etc) */
+  /** Endpoint  (e.g., 'driver', 'cte', etc) */
   @Column({ type: "varchar", length: 80 })
-  entity!: string;
+  endpoint!: string;
 
   /** Método HTTP (e.g., 'GET', 'POST', 'PUT', 'DELETE', etc), será usado para identificar qual a ação que será executada
    * Pode ser usado para diferenciar ações em um mesmo endpoint de integração. Ex: 'POST' para 'CREATE', 'PUT' para 'UPDATE', etc.
@@ -46,6 +47,10 @@ export class RoutingInbound {
    */
   @Column({ type: "varchar", length: 80 })
   method!: string;
+
+  /** Entidade padrão associada ao endpoint (e.g., 'trip.close' para entidade 'trip.update') */
+  @Column({ type: "varchar", length: 80 })
+  entity!: string;    
 
   /** Ação dentro do middleware (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
@@ -84,7 +89,7 @@ export class RoutingInbound {
   
   /** Pré-validação do payload do agente de integração (antes da transformação para o formato canônico) */
   @Column({ type: "jsonb", nullable: true })
-  validation?: Record<string, any> | null;
+  validation?: SchemaValidation | null;
   
   /** Expressão JSONata para transformação do payload de entrada para o formato canônico */
   @Column({ type: "text", nullable: true })

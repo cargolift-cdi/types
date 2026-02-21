@@ -8,7 +8,8 @@ export interface EnvelopeMessage {
   correlation_id?: string;
   routingKey?: string;                     // Tipo do evento (ex: 'integration.erp.driver')
   agent?: string;                         // Agente de integração (e.g., 'erp', 'tms')
-  entity?: string;                        // Nome do recurso que está sendo transacionado: driver, trip, cte, nfse
+  endpoint?: string;                      // Nome do endpoint que está sendo transacionado: driver, trip, cte, nfse
+  entity?: string;                        // Nome da entidade associada ao endpoint (ex: 'driver', 'trip', 'cte', 'nfse')
   action?: string;                        // Ação realizada: CREATE, UPDATE, DELETE, GET
   method?: string;                        // ex: 'CREATE', 'UPDATE', 'DELETE', 'GET'
   record_id?: string;                     // ID do recurso que está sendo transacionado
