@@ -17,6 +17,7 @@ export * from './interfaces/schema-validation.interface.js';
 export * from './interfaces/entity-metadados.interface.js';
 
 export * from './interfaces/audit-trail.interface.js';
+export * from './interfaces/tracking.interface.js';
 
 
 // Entidades
@@ -30,6 +31,8 @@ export * from './entities/middleware/diagnostic-latency.entity.js';
 export * from './entities/middleware/log-routing-inbound.entity.js';
 export * from './entities/middleware/log-integration-outbound.entity.js';
 export * from './entities/middleware/log-mdm.entity.js';
+export * from './entities/middleware/integration-tracking.entity.js';
+export * from './entities/middleware/webhook-subscription.entity.js';
 
 // MDM
 export * from './entities/mdm/mdm-base.entity.js';
@@ -39,3 +42,4 @@ export * from './entities/shared/audit-trail.entity.js';
 // Enum
 export * from './enum/integration.enums.js';
 export * from './enum/error-type.enum.js';
+export * from './enum/tracking.enums.js';
