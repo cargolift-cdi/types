@@ -42,7 +42,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { TransportProtocol } from "../../enum/integration.enums.js";
-import { BreakerPolicy, EndpointConfig, EndpointQueueConfig, EndpointTlsConfig, HttpConfig, RateLimit, RetryPolicy } from "../../interfaces/integration.interface.js";
+import { BreakerPolicy, EndpointConfig, EndpointAMQPConfig, EndpointTlsConfig, HttpConfig, RateLimit, RetryPolicy } from "../../interfaces/integration.interface.js";
 
 
 /**
@@ -130,8 +130,8 @@ export class MiddlewareAgentEndpoint {
    *   properties?: Record<string, any>, // amqp/kafka props
    * }
    */
-  @Column({ name: "queue_config", type: "jsonb", nullable: true })
-  queueConfig?: EndpointQueueConfig| null;
+  @Column({ name: "amqp_config", type: "jsonb", nullable: true })
+  amqpConfig?: EndpointAMQPConfig| null;
 
  
   /**

@@ -23,10 +23,11 @@ export * from './interfaces/tracking.interface.js';
 // Entidades
 export * from './entities/middleware/integration-agent.entity.js';
 export * from './entities/middleware/integration-entity.entity.js';
+export * from './entities/middleware/integration-outbound-snapshot.entity.js';
 export * from './entities/middleware/routing-inbound.entity.js';
 export * from './entities/middleware/routing-outbound.entity.js';
 export * from './entities/middleware/agent-endpoint.entity.js';
-export { MiddlewareAgentEndpoint as IntegrationEndpoint } from './entities/middleware/agent-endpoint.entity.js';
+export * from './entities/middleware/agent-endpoint.entity.js';
 export * from './entities/middleware/integration-credential.entity.js';
 export * from './entities/middleware/diagnostic-latency.entity.js';
 export * from './entities/middleware/log-routing-inbound.entity.js';

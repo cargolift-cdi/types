@@ -1,20 +1,24 @@
+/**
+ * @fileoverview Entidade IntegrationTracking
+ * Registro-mestre de rastreamento end-to-end de uma requisição de integração.
+ * Consolida o status agregado e a lista de steps percorridos por todos os serviços do pipeline (API Hub → ESB → MDM / Connectors).
+ * 
+ * @remarks
+ * - Consultável externamente pelo correlationId (via API REST para sistemas parceiros).
+ * - Usado como base para disparo de webhooks ao final do pipeline.
+ * - Mantido com retenção longa (ex: 365 dias) enquanto logs detalhados por serviço (log_routing_inbound, log_mdm, log_routing_outbound)
+ *   podem ter retenção mais curta.
+ * 
+ * @author Israel A. Possoli
+ * @date 2026-02-22
+ */
+
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { IntegrationStatus } from "../../enum/integration.enums.js";
 import { TrackingCurrentStep } from "../../enum/tracking.enums.js";
 import { TrackingStep } from "../../interfaces/tracking.interface.js";
 
-/**
- * Registro-mestre de rastreamento end-to-end de uma requisição de integração.
- *
- * Consolida o status agregado e a lista de steps percorridos por todos
- * os serviços do pipeline (API Hub → ESB → MDM / Connectors).
- *
- * - Consultável externamente pelo correlationId (via API REST para sistemas parceiros).
- * - Usado como base para disparo de webhooks ao final do pipeline.
- * - Mantido com retenção longa (ex: 365 dias) enquanto logs detalhados
- *   por serviço (log_routing_inbound, log_mdm, log_routing_outbound)
- *   podem ter retenção mais curta.
- */
+
 @Entity({ name: "integration_tracking" })
 @Index(["id"], { unique: true })
 @Index(["correlationId"], { unique: true })

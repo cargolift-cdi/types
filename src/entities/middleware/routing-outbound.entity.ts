@@ -1,9 +1,9 @@
 /**
  * @fileoverview Entidade RoutingOutbound - Define configurações de integração de saída (outbound)
  * @author Israel A. Possoli
- * @date 2026-01-06 * 
- * 
- * Representa a definição de roteamento outbound para integração entre agentes. 
+ * @date 2026-01-06 *
+ *
+ * Representa a definição de roteamento outbound para integração entre agentes.
  * Cada registro define uma rota de saída para uma agente e entidade específica , versão e regras associadas.
  *
  * Esta entidade mapeia uma rota de saída por chave de origem e destino, armazenando
@@ -16,17 +16,9 @@
  * - Somente a versão mais recente de uma rota pode estar ativa; versões anteriores devem ser imutáveis.
  */
 
+import { IntegrationActions } from "src/interfaces/integration.interface";
 import { PayloadConditionsValue } from "../../interfaces/payload-condition.interface";
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from "typeorm";
-
-
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({ name: "routing_outbound" })
 @Index(["agent", "entity", "action", "version"], { unique: true })
@@ -43,13 +35,13 @@ export class RoutingOutbound {
   @Column({ type: "varchar", length: 80 })
   agent!: string;
 
-  /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
+  /** Entidade (chave) (e.g., 'driver', 'person') */
   @Column({ type: "varchar", length: 80 })
   entity!: string;
 
-  /** Ação (e.g., 'create', 'update', 'delete', etc) */
+  /** Ação  - e.g.: 'create', 'update', 'delete', 'all' ou lista de ações separadas por vírgula (ex.: 'create,update') */
   @Column({ type: "varchar", length: 40 })
-  action!: string;  
+  action!: IntegrationActions;
 
   /** Versão da rota. Apenas a última versão pode estar ativa. Versões anteriores não podem sofrer modificações */
   @Column({ type: "int", default: 1 })
@@ -73,7 +65,7 @@ export class RoutingOutbound {
 
   /** Expressão JSONata para transformação do payload de entrada para o formato canônico */
   @Column({ type: "text", nullable: true })
-  transformation?: string | null;  
+  transformation?: string | null;
 
   /** Dependência de outras rotas para o mesmo agent e entidade */
   @Column({ type: "jsonb", default: () => "'{}'::jsonb", nullable: true })
@@ -88,6 +80,4 @@ export class RoutingOutbound {
 
   @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
   updatedAt!: Date;
-  
-
 }

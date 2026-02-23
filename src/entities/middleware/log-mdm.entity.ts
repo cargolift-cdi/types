@@ -37,7 +37,7 @@ export class LogMdm {
   correlationId!: string;
 
   @Column({ name: "record_id", type: "varchar", length: 100, nullable: true })
-  recordId?: string | undefined; // ID do registro afetado (opcional, pode ser preenchido posteriormente para facilitar buscas)
+  recordId?: number | undefined; // ID do registro afetado (opcional, pode ser preenchido posteriormente para facilitar buscas)
 
   /** Business Key */
   @Column({ name: "business_key", type: "jsonb", nullable: true })
@@ -137,6 +137,10 @@ export class LogMdm {
   /** Agente causador do erro */
   @Column({ type: "varchar", length: 15, nullable: true })
   errorSource?: ErrorSource | null;
+
+  /** Rotas de integração de saída (outbound) */
+  @Column({ type: "jsonb", nullable: true })
+  outboundRouting?: Record<string, any>[] | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;

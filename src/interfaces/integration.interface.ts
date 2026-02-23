@@ -52,7 +52,7 @@ export interface HttpConfig {
   };
 }
 
-export interface EndpointQueueConfig {
+export interface EndpointAMQPConfig {
   topic?: string;
   queue?: string;
   exchange?: string;
