@@ -1,5 +1,6 @@
 /**
- * @fileoverview Entidade RoutingOutbound - Define configurações de integração de saída (outbound)
+ * @fileoverview Entidade MiddlewareEndpoint - Define configurações de endpoints de integração de saída (Outbound) para roteamento e políticas de entrega.
+ * Esta entidade representa as rotas de destino para as entidades integradas, incluindo detalhes de transporte, endpoint, credenciais e políticas de retry, rate-limiting e circuit breaker.  
  * @author Israel A. Possoli
  * @date 2026-01-06 * 
 
@@ -48,15 +49,14 @@ import { BreakerPolicy, EndpointConfig, EndpointQueueConfig, EndpointTlsConfig, 
  * Definição de roteamento de saída por chave (entity) e destino.
  * Agora inclui também as configurações de Target/Delivery (protocolo, endpoint, políticas, etc.).
  */
-@Entity({ name: "integration_endpoint" })
-@Index("uq_integration_endpoint_active", ["agent", "entity", "action"], {
+@Entity({ name: "agent_endpoint" })
+@Index("uq_agent_endpoint_active", ["agent", "entity", "action"], {
   unique: true,
   where: `"active" = true`,
 })
-export class IntegrationEndpoint {
+export class MiddlewareAgentEndpoint {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
-
 
   /** Agente de destino (e.g., 'erp', 'wms') */
   @Column({ name: "target_agent", type: "varchar", length: 80 })
