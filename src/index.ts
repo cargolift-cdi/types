@@ -31,7 +31,7 @@ export * from './entities/middleware/agent-endpoint.entity.js';
 export * from './entities/middleware/integration-credential.entity.js';
 export * from './entities/middleware/diagnostic-latency.entity.js';
 export * from './entities/middleware/log-routing-inbound.entity.js';
-export * from './entities/middleware/log-integration-outbound.entity.js';
+export * from './entities/middleware/log-routing-outbound.entity.js';
 export * from './entities/middleware/log-mdm.entity.js';
 export * from './entities/middleware/integration-tracking.entity.js';
 export * from './entities/middleware/webhook-subscription.entity.js';

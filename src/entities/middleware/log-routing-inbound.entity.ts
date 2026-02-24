@@ -49,8 +49,7 @@ export class LogRoutingInbound {
    * Formato: Chave-Valor (Tipo-Referência)
    * Exemplo: { "cte": "000123", "cnpj": "12345678000199" }
    */
-  // TODO: Criar migration para índice GIN
-  @Column({ name: "external_reference", type: "jsonb", nullable: true })
+    @Column({ name: "external_reference", type: "jsonb", nullable: true })
   externalReference?: Record<string, any> | null;
 
   /**
@@ -73,34 +72,6 @@ export class LogRoutingInbound {
   /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
   @Column({ name: "retries", type: "int", nullable: true })
   retries?: number | null;
-
-  /** Timestamp de início de origem onde a mensagem/requisição foi gerada */
-  @Column({ name: "timestamp_origin_start", type: "timestamptz", nullable: true })
-  timestampOriginStart?: Date | string;
-
-  /** Timestamp do início do processamento  */
-  @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
-  timestampStart?: Date | null;
-
-  /** Timestamp da última tentativa do processamento  */
-  @Column({ name: "timestamp_last_attempt", type: "timestamptz", nullable: true })
-  timestampLastAttempt?: Date | null;
-
-  /** Timestamp final do processamento  */
-  @Column({ name: "timestamp_end", type: "timestamptz", nullable: true })
-  timestampEnd?: Date | null;
-
-  /** Duração de processamento (único) em milissegundos */
-  @Column({ name: "duration_ms", type: "int", nullable: true })
-  durationMs?: number | null;
-
-  /** Duração total que a mensagem levou para ser processada */
-  @Column({ name: "duration_total_ms", type: "int", nullable: true })
-  durationTotal?: number | null;
-
-  /** Duração total do ciclo de vida end-to-end em milissegundos */
-  @Column({ name: "duration_lifetime_ms", type: "int", nullable: true })
-  durationLifetime?: number | null;
 
   /** Mensagens de avisos e alertas não críticas */
   @Column({ name: "warns", type: "text", nullable: true })
@@ -145,6 +116,36 @@ export class LogRoutingInbound {
   /** Agente causador do erro */
   @Column({ name: "error_source", type: "varchar", length: 15, nullable: true })
   errorSource?: ErrorSource | null;
+
+
+  /** Timestamp de início de origem onde a mensagem/requisição foi gerada */
+  @Column({ name: "timestamp_origin_start", type: "timestamptz", nullable: true })
+  timestampOriginStart?: Date | string;
+
+  /** Timestamp do início do processamento  */
+  @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
+  timestampStart?: Date | null;
+
+  /** Timestamp da última tentativa do processamento  */
+  @Column({ name: "timestamp_last_attempt", type: "timestamptz", nullable: true })
+  timestampLastAttempt?: Date | null;
+
+  /** Timestamp final do processamento  */
+  @Column({ name: "timestamp_end", type: "timestamptz", nullable: true })
+  timestampEnd?: Date | null;
+
+  /** Duração de processamento (único) em milissegundos */
+  @Column({ name: "duration_ms", type: "int", nullable: true })
+  durationMs?: number | null;
+
+  /** Duração total que a mensagem levou para ser processada */
+  @Column({ name: "duration_total_ms", type: "int", nullable: true })
+  durationTotal?: number | null;
+
+  /** Duração total do ciclo de vida end-to-end em milissegundos */
+  @Column({ name: "duration_lifetime_ms", type: "int", nullable: true })
+  durationLifetime?: number | null;
+
 
   /** ID da tabela routing_inbound */
   @Column({ name: "inbound_id", type: "bigint", nullable: true })

@@ -1,5 +1,5 @@
 import { LogRoutingInbound } from "../entities/middleware/log-routing-inbound.entity.js";
-import { LogRoutingOutbound } from "../entities/middleware/log-integration-outbound.entity.js";
+import { LogRoutingOutbound } from "../entities/middleware/log-routing-outbound.entity.js";
 import { IntegrationTracking } from "../entities/middleware/integration-tracking.entity.js";
 import { ErrorSource, ErrorType, LogMdm } from "../index.js";
 

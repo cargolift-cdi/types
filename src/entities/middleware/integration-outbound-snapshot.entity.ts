@@ -18,6 +18,7 @@ import { IntegrationActions } from "../../interfaces/integration.interface";
 @Entity({ name: "integration_outbound_snapshot" })
 @Index(["id"], { unique: true })
 @Index(["agent", "entity", "action"])
+@Index(["agent", "entity", "action", "correlationId"], { unique: true })
 @Index(["agent", "entity", "action", "sentAt"])
 @Index(["correlationId"])
 @Index(["createdAt"])
@@ -42,15 +43,19 @@ export class IntegrationOutboundSnapshot {
   @Column({ name: "business_key", type: "jsonb", nullable: true })
   businessKey?: Record<string, any> | null;  
 
+  // Status do snapshot, refletindo o resultado da tentativa de envio para o sistema de destino
+  @Column({ type: "varchar", length: 20 })
+  status!: "pending" | "confirmed" | "failed";
+
+  // Data de envio da integração de saída (outbound)
+  @Column({ name: "sent_at", type: "timestamptz", nullable: true })
+  sentAt!: Date | null;  
+
   @Column({ name: "payload_hash" })
   payloadHash!: string;
 
   @Column({ type: "jsonb" })
   payload!: Record<string, unknown>;
-
-  // Data de envio da integração de saída (outbound)
-  @Column({ name: "sent_at", type: "timestamptz" })
-  sentAt!: Date;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;

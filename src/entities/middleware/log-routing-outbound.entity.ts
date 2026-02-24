@@ -16,8 +16,8 @@ import { ErrorSource, ErrorType } from "../../enum/error-type.enum.js";
  */
 @Entity({ name: "log_routing_outbound" })
 @Index(["id"], { unique: true })
-@Index(["correlationId"], { unique: true })
-@Index(["agent", "entity", "action"])
+@Index(["agent", "entity", "action", "correlationId"], { unique: true })
+@Index(["correlationId"])
 @Index(["status", "updatedAt"])
 @Index(["agent", "entity", "updatedAt"])
 export class LogRoutingOutbound {
@@ -36,6 +36,11 @@ export class LogRoutingOutbound {
   @Column({ type: "varchar", length: 40 })
   action!: string;
 
+  /** Correlation Id */
+  @Column({ name: "correlation_id", type: "varchar", length: 36 })
+  correlationId!: string;
+
+
   /** Business Key */
   @Column({ name: "business_key", type: "jsonb", nullable: true })
   businessKey?: Record<string, any> | null;
@@ -48,41 +53,16 @@ export class LogRoutingOutbound {
   @Column({ name: "external_reference", type: "jsonb", nullable: true })
   externalReference?: Record<string, any> | null;
 
-  /** Correlation Id */
-  @Column({ name: "correlation_id", type: "varchar", length: 36 })
-  correlationId!: string;
 
-  /** Timestamp de início de origem da requisição na API */
-  @Column({ name: "timestamp_origin_start", type: "timestamptz", nullable: true })
-  timestampOriginStart?: Date | string;
-  
-  /** Timestamp do início do processamento  */
-  @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
-  timestampStart?: Date | null;  
+  /**
+   * Modo de roteamento utilizado
+   * - 'direct': Roteia diretamente para agentes de destino sem passar pelo ODS
+   * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para agentes de destino
+   * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para agentes de destino
+   */
+  @Column({ name: "routing_mode", type: "varchar", length: 20, nullable: true })
+  routingMode?: string | null;  
 
-  /** Timestamp da última tentativa do processamento */
-  @Column({ name: "timestamp_last_attempt", type: "timestamptz", nullable: true })
-  timestampLastAttempt?: Date | null;
-
-  /** Timestamp final do processamento  */
-  @Column({ name: "timestamp_end", type: "timestamptz", nullable: true })
-  timestampEnd?: Date | null;
-
-  /** Duração total em milissegundos */
-  @Column({ name: "duration_request_ms", type: "int", nullable: true })
-  durationRequest?: number | null;  
-
-  /** Duração do processamento em milissegundos no ESB */
-  @Column({ name: "duration_process_ms", type: "int", nullable: true })
-  durationProcessMs?: number | null;
-
-  /** Duração total em milissegundos */
-  @Column({ name: "duration_ms", type: "int", nullable: true })
-  durationMs?: number | null;
-
-  /** Duração total do ciclo de vida end-to-end em milissegundos */
-  @Column({ name: "duration_lifetime_ms", type: "int", nullable: true })
-  durationLifetime?: number | null;
 
   /** Status final do processamento */
   @Column({ type: 'varchar', length: 10, nullable: false })
@@ -144,13 +124,38 @@ export class LogRoutingOutbound {
   @Column({ type: 'varchar', length: 15, nullable: true })
   errorSource?: ErrorSource | null;
 
-  /** Indica se este log veio de um replay manual ou DLQ */
-  // @Column({ type: 'boolean', default: false })
-  // wasReplayedFromDlq!: boolean;  
+   /** Timestamp de início de origem onde a mensagem/requisição foi gerada */
+  @Column({ name: "timestamp_origin_start", type: "timestamptz", nullable: true })
+  timestampOriginStart?: Date | string;
 
-  /** ID da tabela routing_inbound */
+  /** Timestamp do início do processamento  */
+  @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
+  timestampStart?: Date | null;
+
+  /** Timestamp da última tentativa do processamento  */
+  @Column({ name: "timestamp_last_attempt", type: "timestamptz", nullable: true })
+  timestampLastAttempt?: Date | null;
+
+  /** Timestamp final do processamento  */
+  @Column({ name: "timestamp_end", type: "timestamptz", nullable: true })
+  timestampEnd?: Date | null;
+
+  /** Duração de processamento (único) em milissegundos */
+  @Column({ name: "duration_ms", type: "int", nullable: true })
+  durationMs?: number | null;
+
+  /** Duração total que a mensagem levou para ser processada */
+  @Column({ name: "duration_total_ms", type: "int", nullable: true })
+  durationTotal?: number | null;
+
+  /** Duração total do ciclo de vida end-to-end em milissegundos */
+  @Column({ name: "duration_lifetime_ms", type: "int", nullable: true })
+  durationLifetime?: number | null;
+
+
+  /** ID da tabela routing_outbound */
   @Column({ type: 'bigint', nullable: true  })
-  inboundId!: string; // manter string no TS para bigint seguro
+  outboundId!: string; // manter string no TS para bigint seguro
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
