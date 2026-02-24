@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { IntegrationStatus } from "../../enum/integration.enums.js";
 import { ErrorSource, ErrorType } from "../../enum/error-type.enum.js";
+import { IntegrationActions } from "src/interfaces/integration.interface.js";
 
 
 /**
@@ -34,7 +35,7 @@ export class LogRoutingOutbound {
 
   /** Ação (e.g., 'create', 'update', 'delete', etc) */
   @Column({ type: "varchar", length: 40 })
-  action!: string;
+  action!: IntegrationActions;
 
   /** Correlation Id */
   @Column({ name: "correlation_id", type: "varchar", length: 36 })

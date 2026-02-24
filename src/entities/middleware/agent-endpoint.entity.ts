@@ -50,7 +50,7 @@ import { BreakerPolicy, EndpointConfig, EndpointAMQPConfig, EndpointTlsConfig, H
  * Agora inclui também as configurações de Target/Delivery (protocolo, endpoint, políticas, etc.).
  */
 @Entity({ name: "agent_endpoint" })
-@Index("uq_agent_endpoint_active", ["agent", "entity", "action"], {
+@Index("uq_agent_endpoint_active", ["agent", "entity", "action", "version"], {
   unique: true,
   where: `"active" = true`,
 })
@@ -59,7 +59,7 @@ export class MiddlewareAgentEndpoint {
   id!: string; // manter string no TS para bigint seguro
 
   /** Agente de destino (e.g., 'erp', 'wms') */
-  @Column({ name: "target_agent", type: "varchar", length: 80 })
+  @Column({ name: "agent", type: "varchar", length: 80 })
   agent!: string;
 
   /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
@@ -95,7 +95,7 @@ export class MiddlewareAgentEndpoint {
   endpoint!: string;
 
   /**
-   * Referência a credenciais reutilizáveis (IntegrationCredential.id).
+   * Referência a credenciais reutilizáveis (MiddlewareAgentCredential.id).
    */
   @Column({ name: "credential_id", type: "bigint", nullable: true })
   credentialId?: string | null;

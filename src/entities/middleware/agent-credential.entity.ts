@@ -47,9 +47,9 @@ import { Credential, CredentialSecrets } from '../../interfaces/integration.inte
  * Perfil de credenciais reutilizáveis para autenticação (API Key, Basic, Bearer, OAuth2).
  * Utilize credentialId no RoutingOutbound para referenciar estas credenciais.
  */
-@Entity({ name: 'integration_credential' })
+@Entity({ name: 'agent_credential' })
 @Index(['name'], { unique: true })
-export class IntegrationCredential {
+export class MiddlewareAgentCredential {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
