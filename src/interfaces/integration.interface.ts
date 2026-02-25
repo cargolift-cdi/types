@@ -121,7 +121,17 @@ export interface CredentialSecrets {
   };
 }
 
-
+/**
+ * Configurações de integração para roteamento, transformação, validação e monitoramento.
+ * Inclui configurações específicas para cada protocolo de transporte (HTTP, AMQP, etc) e políticas de retry, rate-limit e breaker.
+ * Utilizado para definir as rotas de integração de entrada (inbound) e saída (outbound) no middleware.
+ * Exemplo:
+ * {
+ *  "route": "delete",
+ *  "conditions": { "left": "mode", "operator": "=", "right": "delete" },
+ *  "default": false
+ * }
+ */
 export interface IntegrationInboundRouting {
     route: string;
     conditions?: PayloadConditionsValue;

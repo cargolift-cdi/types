@@ -68,7 +68,7 @@ export class RoutingInbound {
   @Column({ type: "varchar", length: 500, nullable: true })
   description?: string | null;
 
-  /** Condições de definição para entidades (entity) baseadas no payload canônico (transformado).
+  /** Condições de definição para entidades (entity) baseadas no payload original (antes da transformação para o formato canônico)
    * É aplicado dentro do ESB
    * Sobrepõe a entidade definida no campo 'entity' para roteamento condicional baseado no conteúdo do payload. 
    * Ex: Uma integração de pessoa física (people) quando no payload tiver um campo "type" com valor "driver", então a entidade será 'driver' ao invés de 'people'
@@ -77,7 +77,7 @@ export class RoutingInbound {
   @Column({ name: "routing_entity", type: "jsonb", nullable: true })
   routingEntity?: IntegrationInboundRouting[];
 
-  /** Condições de definição para ações (action) baseadas no payload canônico (transformado).
+  /** Condições de definição para ações (action) baseadas no payload transformado (após a transformação para o formato canônico)
    * É aplicado dentro do ESB
    * Sobrepõe a ação definida no campo 'action' para roteamento condicional baseado no conteúdo do payload. 
    * Ex: Se o payload tiver um campo "operation" com valor "update", então a ação será 'update' ao invés de 'create', mesmo que o método HTTP seja 'POST'.
