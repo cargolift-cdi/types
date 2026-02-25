@@ -25,7 +25,7 @@ export class WebhookSubscription {
   id!: string; // manter string no TS para bigint seguro
 
   /**
-   * ID do agente de integração inscrito (FK lógica → integration_agent.id).
+   * ID do agente de integração inscrito (FK lógica → agent.id).
    * Identifica qual sistema parceiro receberá as notificações.
    */
   @Column({ name: "agent_id", type: "bigint" })

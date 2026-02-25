@@ -1,7 +1,7 @@
 /**
  * Representa um agente de integração registrado na aplicação.
  *
- * Cada instância mapeia uma linha da tabela "integration_agent".
+ * Cada instância mapeia uma linha da tabela "agent".
  *
  * @property id Identificador único do agente de integração (armazenado como bigint no banco). Mantém-se como string no TypeScript para evitar perda de precisão com bigints.
  * @property agent Nome único do agente de integração (ex.: 'erp', 'tms'). Campo varchar com até 80 caracteres.
@@ -11,9 +11,9 @@
  */
 import { Column, Entity, PrimaryGeneratedColumn, Index, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity({ name: 'integration_agent' })
+@Entity({ name: 'agent' })
 @Index(["agent"], { unique: true })
-export class IntegrationAgent {
+export class MiddlewareAgent {
   /** Identificador único do agente de integração */
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
