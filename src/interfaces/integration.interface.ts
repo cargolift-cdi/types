@@ -44,9 +44,15 @@ export interface HttpConfig {
   method: HttpMethod;
   path?: string; // ex.: /v1/drivers
   header?: HttpHeader;
+
+  // Permite definir query params fixos ou dinâmicos (extraídos do payload via JsonPath)
   queryParams?: Record<string, string>;
+
+  // Para casos mais complexos, permite definir uma função de interpretação da resposta com base em regras configuráveis
   responseInterpreter?: ResponseInterpreterRules;
   compression?: { type?: "gzip" | "deflate" | "br" };
+
+  // Configurações de retry específicas para HTTP, permitindo definir quais status codes devem ser considerados para retry
   onError?: {
     retryStatusCodes?: number[]; // ex.: [500, 502, 503, 504]
   };

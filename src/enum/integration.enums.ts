@@ -29,7 +29,8 @@ export enum IntegrationStatus {
   SUCCESS = 'success',
   FAILED = 'failed',
   RETRYING = 'retrying',
-  DISCARTED = 'discarted'
+  /** @note valor armazenado no banco como 'discarted' (typo legado, mantido para compatibilidade) */
+  DISCARTED = 'discarded'
 }
 
 
