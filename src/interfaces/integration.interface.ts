@@ -1,4 +1,3 @@
-import { HttpMethod } from "../enum/integration.enums.js";
 import { PayloadConditionsValue } from "../interfaces/payload-condition.interface.js";
 
 export type IntegrationActions = "create" | "update" | "upsert" | "delete" | "clean" | "view";
@@ -24,48 +23,6 @@ export interface ResponseInterpreterRules {
 export interface HttpHeader {
   contentType?: string; // 'application/json' | 'application/xml' | 'text/plain' | etc
   [key: string]: string | undefined;
-}
-
-export interface EndpointConfig {
-  timeoutMs?: number;
-}
-
-/** Configurações específicas quando transportProtocol é HTTP/REST.
-  * Exemplo de configuração de template de resposta:
-   "responseTemplate": {
-    "success": { "path": "data.success", "equals": true },
-    "message": "data.message",
-    "details": ["data", "errors"],
-    "failureType": "business",
-    "failureStatus": 422
-  }
-  */
-export interface HttpConfig {
-  method: HttpMethod;
-  path?: string; // ex.: /v1/drivers
-  header?: HttpHeader;
-
-  // Permite definir query params fixos ou dinâmicos (extraídos do payload via JsonPath)
-  queryParams?: Record<string, string>;
-
-  // Para casos mais complexos, permite definir uma função de interpretação da resposta com base em regras configuráveis
-  responseInterpreter?: ResponseInterpreterRules;
-  compression?: { type?: "gzip" | "deflate" | "br" };
-
-  // Configurações de retry específicas para HTTP, permitindo definir quais status codes devem ser considerados para retry
-  onError?: {
-    retryStatusCodes?: number[]; // ex.: [500, 502, 503, 504]
-  };
-}
-
-export interface EndpointAMQPConfig {
-  topic?: string;
-  queue?: string;
-  exchange?: string;
-  routingKey?: string;
-  partitionKey?: string;
-  messageKey?: string;
-  properties?: Record<string, any>; // propriedades específicas do broker
 }
 
 export interface EndpointTlsConfig {
@@ -101,31 +58,89 @@ export interface BreakerPolicy {
   halfOpenMaxAttempts?: number; // Tentativas permitidas no estado half-open
 }
 
-export interface Credential {
-  apiKey?: { headerName?: string; queryName?: string; prefix?: string };
-  basic?: { usernameField?: string };
-  bearer?: { headerName?: string; prefix?: string };
-  oauth2?: {
-    tokenUrl: string;
-    clientId: string;
-    scopes?: string[] | string;
-    audience?: string;
-    resource?: string;
-    authStyle?: "body" | "basic" | "bearer";
-  };
+/**
+ * Configuração agrupada de resiliência para o endpoint.
+ * Agrupa retry, rate-limit, circuit breaker e concorrência máxima em um único objeto.
+ */
+export interface ResiliencePolicy {
+  /** Política de retentativa */
+  retry?: RetryPolicy;
+  /** Rate limiting (token bucket distribuído via Redis) */
+  rateLimit?: RateLimit;
+  /** Circuit breaker por endpoint */
+  breaker?: BreakerPolicy;
+  /** Concorrência máxima local por endpoint nesta instância (default: 1) */
+  maxConcurrent?: number;
 }
 
-export interface CredentialSecrets {
-  apiKey?: { value: string };
-  basic?: { username: string; password: string };
-  bearer?: { token: string };
-  oauth2?: {
-    clientSecret: string;
-    username?: string;
-    password?: string;
-    privateKey?: string;
-  };
+// ─── Credential (shapes achatados por tipo) ─────────────────────────
+// O campo `type` (AuthType) na entidade MiddlewareAgentCredential discrimina
+// qual shape se aplica. Não há mais aninhamento por tipo dentro do JSONB.
+//
+// Shapes de config (não sensível):
+//   API_KEY:                     { headerName?, queryName?, prefix? }
+//   BASIC:                       (vazio / null)
+//   BEARER_STATIC:               { headerName?, prefix? }
+//   OAUTH2_CLIENT_CREDENTIALS:   { tokenUrl, clientId, scopes?, audience?, resource?, authStyle? }
+//   OAUTH2_PASSWORD:             { tokenUrl, clientId, scopes? }
+//   JWT:                         { algorithm?, headerName?, headerPrefix?, issuer?, subject?, ... }
+//
+// Shapes de secrets (sensível):
+//   API_KEY:                     { value }
+//   BASIC:                       { username, password }
+//   BEARER_STATIC:               { token }
+//   OAUTH2_CLIENT_CREDENTIALS:   { clientSecret }
+//   OAUTH2_PASSWORD:             { clientSecret, username, password }
+//   JWT:                         { sharedSecret?, privateKey?, passphrase? }
+// ─────────────────────────────────────────────────────────────────────
+
+// ─── GraphQL Endpoint Config ────────────────────────────────────────
+
+/**
+ * Configuração específica para endpoints GraphQL.
+ * Armazenada como JSONB na coluna `graphql_config` de `MiddlewareAgentEndpoint`.
+ *
+ * O conector GraphQL monta o body `{ query, variables, operationName }` com base nesta config.
+ *
+ * @example
+ * ```json
+ * {
+ *   "query": "mutation CreateDriver($input: DriverInput!) { createDriver(input: $input) { id name } }",
+ *   "operationName": "CreateDriver",
+ *   "variablesMapping": "{ \"input\": $ }"
+ * }
+ * ```
+ */
+export interface GraphqlEndpointConfig {
+  /** Query ou mutation GraphQL a ser enviada (obrigatória) */
+  query: string;
+
+  /** Nome da operação (opcional — útil quando a query contém múltiplas operações) */
+  operationName?: string;
+
+  /**
+   * Variáveis padrão mescladas com o payload (shallow merge).
+   * Útil para valores fixos que devem acompanhar toda requisição.
+   */
+  defaultVariables?: Record<string, unknown>;
+
+  /**
+   * Expressão JSONata para mapear o payload transformado (ESB/BRE) para `variables`.
+   * Se definido, o resultado da expressão substitui o payload como variables.
+   * Se não definido, o payload transformado é enviado diretamente como variables.
+   *
+   * @example "{ \"input\": $ }"  — envolve o payload inteiro em `input`
+   * @example "{ \"id\": $.code, \"name\": $.fullName }" — mapeia campos específicos
+   */
+  variablesMapping?: string;
 }
+
+
+/** Config não-sensível da credencial. Shape depende de `credential.type`. */
+export type CredentialConfig = Record<string, unknown>;
+
+/** Segredos sensíveis da credencial. Shape depende de `credential.type`. */
+export type CredentialSecrets = Record<string, unknown>;
 
 /**
  * Configurações de integração para roteamento, transformação, validação e monitoramento.

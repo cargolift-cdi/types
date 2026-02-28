@@ -1,37 +1,13 @@
 /**
- * @fileoverview Entidade MiddlewareEndpoint - Define configurações de endpoints de integração de saída (Outbound) para roteamento e políticas de entrega.
- * Esta entidade representa as rotas de destino para as entidades integradas, incluindo detalhes de transporte, endpoint, credenciais e políticas de retry, rate-limiting e circuit breaker.  
+ * @fileoverview Entidade MiddlewareAgentEndpoint — configuração de endpoints de integração outbound.
+ *
+ * Cada registro define o destino, o método HTTP, a autenticação e as políticas de resiliência
+ * (retry, rate-limit, circuit breaker, concorrência) para uma combinação (agent, entity, action).
+ *
+ * A combinação (agent, entity, action, version) é única quando `active = true`.
+ *
  * @author Israel A. Possoli
- * @date 2026-01-06 * 
-
- * Definição de roteamento e configuração de entrega/saída para entidades de integração (Outbound).
- *
- * Representa uma rota/endpoint de destino para uma entidade específica, incluindo
- * informações de transporte, endpoint, credenciais, políticas de retry, rate-limiting,
- * circuit breaker, idempotência e configurações específicas por protocolo (HTTP, filas/streams).
- *
- * Observações importantes:
- * - A combinação (agent, entity, action) é única. Há também um índice condicional que garante
- *   unicidade quando active = true (ou seja, apenas uma rota ativa por chave).
- * - O campo `id` é um bigint no banco — no TypeScript é mantido como string para segurança.
- * 
- * @remarks
- * - Esta entidade centraliza tanto o roteamento (por agent/entity/action) quanto as políticas e
- *   configurações de entrega, permitindo múltiplos tipos de transporte e adaptações por destino.
- * - Campos JSONB (httpConfig, queueConfig, tls, retryPolicy, rateLimit, breakerPolicy, idempotency)
- *   devem seguir os formatos esperados pelo componente de entrega para serem interpretados corretamente.* 
- *
- * @property transportProtocol Protocolo de transporte usado para a entrega (ex.: 'REST', 'SOAP', 'AMQP', 'KAFKA').
- * @property endpoint Endpoint principal/URI/host/connection string dependente do protocolo:
- * - HTTP(S): baseUrl (ex.: https://api.exemplo.com)
- * - AMQP: amqp://broker:5672
- * - Kafka: broker1:9092,broker2:9092
- * - SQS/PubSub: ARN, tópico ou projeto+tópico
- *
- * @property httpConfig Configurações específicas quando transportProtocol é HTTP/REST.
- *
- * @property queueConfig Configurações para filas/streams quando transportProtocol é AMQP/Kafka/SQS/PubSub.
- *
+ * @date 2026-01-06
  */
 import {
   Column,
@@ -41,14 +17,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { TransportProtocol } from "../../enum/integration.enums.js";
-import { BreakerPolicy, EndpointConfig, EndpointAMQPConfig, EndpointTlsConfig, HttpConfig, RateLimit, RetryPolicy } from "../../interfaces/integration.interface.js";
+import { HttpMethod, TransportProtocol } from "../../enum/integration.enums.js";
+import { EndpointTlsConfig, GraphqlEndpointConfig, HttpHeader, ResiliencePolicy, ResponseInterpreterRules } from "../../interfaces/integration.interface.js";
 
 
-/**
- * Definição de roteamento de saída por chave (entity) e destino.
- * Agora inclui também as configurações de Target/Delivery (protocolo, endpoint, políticas, etc.).
- */
 @Entity({ name: "agent_endpoint" })
 @Index("uq_agent_endpoint_active", ["agent", "entity", "action", "version"], {
   unique: true,
@@ -58,124 +30,104 @@ export class MiddlewareAgentEndpoint {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
-  /** Agente de destino (e.g., 'erp', 'wms') */
-  @Column({ name: "agent", type: "varchar", length: 80 })
+  /** Agente de destino (ex.: 'erp', 'wms') */
+  @Column({ type: "varchar", length: 80 })
   agent!: string;
 
-  /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
+  /** Entidade integrada (ex.: 'invoice', 'driver') */
   @Column({ type: "varchar", length: 80 })
   entity!: string;
 
-  /** Ação (e.g., 'create', 'update', 'delete', etc) */
+  /** Ação (ex.: 'create', 'update', 'delete', 'all', 'upsert') */
   @Column({ type: "varchar", length: 40 })
   action!: string;
 
   @Column({ type: "int", default: 1 })
-  version!: number;    
+  version!: number;
 
   @Column({ type: "boolean", default: true })
   active!: boolean;
 
-  /** ===================== Target/Delivery (simplificado no próprio Outbound) ===================== */
+  // ─── Transporte ─────────────────────────────────────────────────
 
-  /**
-   * Transporte de saída: 'REST' | 'SOAP' | 'AMQP' | etc
-   */
+  /** Protocolo de saída: 'REST' | 'SOAP' | 'GRAPHQL' | 'AMQP' */
   @Column({ name: "transport_protocol", type: "varchar", length: 20 })
   transportProtocol!: TransportProtocol;
 
-  /**
-   * Endpoint principal:
-   *  - http(s): baseUrl (ex.: https://api.exemplo.com)
-   *  - amqp: uri/host (ex.: amqp://broker:5672)
-   *  - kafka: bootstrap servers (ex.: broker1:9092,broker2:9092)
-   *  - sqs/pubsub: pode ser arn/topic/queue ou projeto+tópico
-   */
-  @Column({ type: "varchar", length: 500 })
-  endpoint!: string;
+  /** URL base do destino (ex.: https://api.example.com) */
+  @Column({ name: "base_url", type: "varchar", length: 500 })
+  baseUrl!: string;
 
-  /**
-   * Referência a credenciais reutilizáveis (MiddlewareAgentCredential.id).
-   */
+  // ─── HTTP ───────────────────────────────────────────────────────
+
+  /** Método HTTP (ex.: POST, PUT, GET) */
+  @Column({ name: "http_method", type: "varchar", length: 10 })
+  method!: HttpMethod;
+
+  /** Caminho relativo à baseUrl (ex.: /v1/invoices) */
+  @Column({ type: "varchar", length: 500, nullable: true })
+  path?: string | null;
+
+  /** Content-Type padrão para o body (default: application/json) */
+  @Column({ name: "content_type", type: "varchar", length: 100, nullable: true })
+  contentType?: string | null;
+
+  /** Headers customizados (ex.: { "X-Tenant-Id": "cargolift" }) */
+  @Column({ type: "jsonb", nullable: true })
+  headers?: HttpHeader | null;
+
+  /** Query parameters fixos (ex.: { "format": "full" }) */
+  @Column({ name: "query_params", type: "jsonb", nullable: true })
+  queryParams?: Record<string, string> | null;
+
+  /** Regras de interpretação da resposta (para validar sucesso/falha configurável) */
+  @Column({ name: "response_rules", type: "jsonb", nullable: true })
+  responseRules?: ResponseInterpreterRules | null;
+
+  /** Status HTTP que devem ser tratados como retryable (ex.: [500, 502, 503, 504]) */
+  @Column({ name: "retryable_status_codes", type: "jsonb", nullable: true })
+  retryableStatusCodes?: number[] | null;
+
+  /** Timeout da requisição HTTP em milissegundos (default no engine: 15000) */
+  @Column({ name: "timeout_ms", type: "int", nullable: true })
+  timeoutMs?: number | null;
+
+  // ─── Autenticação ───────────────────────────────────────────────
+
+  /** Referência a credenciais reutilizáveis (agent_credential.id) */
   @Column({ name: "credential_id", type: "bigint", nullable: true })
   credentialId?: string | null;
 
+  // ─── TLS ────────────────────────────────────────────────────────
+
+  /** Opções de TLS/mTLS (certificados, SNI, etc.) */
+  @Column({ type: "jsonb", nullable: true })
+  tls?: EndpointTlsConfig | null;
+
+  // ─── Resiliência ────────────────────────────────────────────────
+
   /**
-   * Opções de TLS/MTLS, certificados, SNI etc.
-   * Ex.: { rejectUnauthorized: true, ca?: string, cert?: string, key?: string, servername?: string }
+   * Políticas de resiliência agrupadas:
+   * { retry?: RetryPolicy, rateLimit?: RateLimit, breaker?: BreakerPolicy, maxConcurrent?: number }
    */
   @Column({ type: "jsonb", nullable: true })
-  tls?: EndpointTlsConfig | null;  
+  resilience?: ResiliencePolicy | null;
+
+  // ─── GraphQL ────────────────────────────────────────────────────
 
   /**
-   * Configurações gerais do endpoint
+   * Configuração específica para endpoints GraphQL:
+   * { query, operationName?, defaultVariables?, variablesMapping? }
+   * Usado apenas quando transportProtocol = 'GRAPHQL'.
    */
-  @Column({ name: "config", type: "jsonb", nullable: true })
-  config?: EndpointConfig | null;
+  @Column({ name: "graphql_config", type: "jsonb", nullable: true })
+  graphqlConfig?: GraphqlEndpointConfig | null;
 
-  // @Column({ name: "http_method", type: "varchar", length: 10, default: 'POST', nullable: true })
-  // httpMethod!: HttpMethod | null;
-
-  /**
-   * Config HTTP específica (quando transport = 'REST'):
-   */
-  @Column({ name: "http_config", type: "jsonb", nullable: true })
-  httpConfig?: HttpConfig | null;
-
-  /**
-   * Config de fila/stream (quando transport = 'amqp' | 'kafka' | 'sqs' | 'pubsub'):
-   * {
-   *   topic?: string, queue?: string, exchange?: string, routingKey?: string,
-   *   partitionKey?: string, messageKey?: string,
-   *   properties?: Record<string, any>, // amqp/kafka props
-   * }
-   */
-  @Column({ name: "amqp_config", type: "jsonb", nullable: true })
-  amqpConfig?: EndpointAMQPConfig| null;
-
- 
-  /**
-   * Política de retentativa:
-   * { maxAttempts: 3, strategy: 'exponential' | 'fixed', delayMs: 1000, maxDelayMs?: 60000, jitter?: true }
-   */
-  @Column({ name: "retry_policy", type: "jsonb", nullable: true })
-  retryPolicy?: RetryPolicy | null;
-
-  /**
-   * Rate limiting por rota:
-   * { limit: 100, intervalMs: 1000, burst?: 50, key?: 'targetAgent' | 'endpoint' | 'custom' }
-   */
-  @Column({ name: "rate_limit", type: "jsonb", nullable: true })
-  rateLimit?: RateLimit | null;
-
-  /**
-   * Política de circuit breaker opcional por endpoint.
-   * { threshold?: number; openMs?: number; halfOpenMaxAttempts?: number }
-   */
-  @Column({ name: "breaker_policy", type: "jsonb", nullable: true })
-  breakerPolicy?: BreakerPolicy | null;
-
-  /**
-   * Concorrência máxima local por endpoint nesta instância.
-   * Controla quantas requisições simultâneas este endpoint pode ter por processo.
-   * Default: 1 (serialização local).
-   */
-  @Column({ name: "max_concurrent_per_endpoint", type: "int", nullable: true })
-  maxConcurrentPerEndpoint?: number | null;
-
-  /**
-   * Idempotência:
-   * { strategy: 'header' | 'bodyHash' | 'custom', headerName?: 'Idempotency-Key', ttlMs?: 300000 }
-   */
-  /*
-  @Column({ type: "jsonb", nullable: true })
-  idempotency?: Record<string, any> | null;
-  */
+  // ─── Metadados ──────────────────────────────────────────────────
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
   @UpdateDateColumn({ name: "updated_at", type: "timestamptz" })
   updatedAt!: Date;
-
 }

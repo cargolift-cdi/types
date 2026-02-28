@@ -21,7 +21,8 @@ export enum AuthType {
   BASIC = 'BASIC',
   BEARER_STATIC = 'BEARER_STATIC',
   OAUTH2_CLIENT_CREDENTIALS = 'OAUTH2_CLIENT_CREDENTIALS',
-  OAUTH2_PASSWORD = 'OAUTH2_PASSWORD'
+  OAUTH2_PASSWORD = 'OAUTH2_PASSWORD',
+  JWT = 'JWT',
 }
 
 export enum IntegrationStatus {
@@ -29,8 +30,7 @@ export enum IntegrationStatus {
   SUCCESS = 'success',
   FAILED = 'failed',
   RETRYING = 'retrying',
-  /** @note valor armazenado no banco como 'discarted' (typo legado, mantido para compatibilidade) */
-  DISCARTED = 'discarded'
+  DISCARDED = 'discarded',
 }
 
 

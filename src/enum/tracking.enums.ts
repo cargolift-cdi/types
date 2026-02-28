@@ -18,7 +18,7 @@ export enum TrackingCurrentStep {
   /** Pipeline concluído com falha */
   FAILED = "failed",
   /** Mensagem descartada (regra de negócio, duplicidade, etc) */
-  DISCARTED = "discarted",
+  DISCARDED = "discarded",
 }
 
 /**
