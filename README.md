@@ -1,6 +1,5 @@
 # @cargolift-cdi/types
-
-Shared TypeScript types and interfaces for Node.js projects. This package is types-only (no runtime JS).
+Biblioteca de tipos TypeScript compartilhados para projetos Node.js. Este pacote é apenas de tipos (sem JS em tempo de execução).
 
 ## Install
 
