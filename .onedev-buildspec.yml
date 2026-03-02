@@ -1,0 +1,154 @@
+version: 44
+jobs:
+- name: security-scan
+  steps:
+  - type: CheckoutStep
+    name: checkout
+    cloneCredential:
+      type: DefaultCredential
+    withLfs: false
+    withSubmodules: false
+    condition: SUCCESSFUL
+    optional: false
+  - type: CommandStep
+    name: bandit scan
+    runInContainer: true
+    image: python:3.10
+    interpreter:
+      type: DefaultInterpreter
+      commands: "pip install pipx --root-user-action=ignore\npipx install bandit\npipx ensurepath\nexport PATH=$PATH:/root/.local/bin\nif grep -Rrl --include=\"*.py\" \"\" . >/dev/null 2>&1; then\n\t\tmkdir -p scans\n        bandit -r . -x tests,venv,.git,.scannerwork -f json -o scans/bandit.json || echo \"Bandit encontrou issues\";\n      else echo \"Ignorando (não é Python)\"; fi\n"
+    useTTY: false
+    condition: SUCCESSFUL
+    optional: false
+  - type: CommandStep
+    name: semgrep scan
+    runInContainer: true
+    image: returntocorp/semgrep:1.45
+    interpreter:
+      type: DefaultInterpreter
+      commands: |
+        semgrep --config=auto --json --output scans/semgrep.json .
+    useTTY: false
+    condition: SUCCESSFUL
+    optional: false
+  - type: PublishArtifactStep
+    name: publish security reports
+    artifacts: scans/**
+    condition: SUCCESSFUL
+    optional: false
+  triggers:
+  - type: DependencyFinishedTrigger
+  jobDependencies:
+  - jobName: prepare-context
+    requireSuccessful: true
+    artifacts: '**'
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 14400
+- name: sonar-scan
+  steps:
+  - type: CommandStep
+    name: sonar scan
+    runInContainer: true
+    image: sonarsource/sonar-scanner-cli:5
+    interpreter:
+      type: DefaultInterpreter
+      commands: |
+        sonar-scanner -Dsonar.projectKey=@project_name@ -Dsonar.sources=. -Dsonar.python.version=3.10 -Dsonar.exclusions=**/.git/**,**/.scannerwork/**,**/venv/**,**/__pycache__/**,**/*.json,**/*.csv,**/*.parquet,**/*.pkl,**/*.joblib,**/*.ipynb,**/node_modules/**,**/dist/**,**/build/**,**/tests/** -Dsonar.host.url=https://sonarqube.cargolift.com.br -Dsonar.scanner.skipJreProvisioning=true -Dsonar.scanner.skipJreProvisioning=true -Dsonar.ws.timeout=60
+    envVars:
+    - name: SONAR_TOKEN
+      value: '@secret:SONAR_TOKEN@'
+    useTTY: false
+    condition: SUCCESSFUL
+    optional: false
+  triggers:
+  - type: DependencyFinishedTrigger
+  jobDependencies:
+  - jobName: prepare-context
+    requireSuccessful: true
+    artifacts: scans/**
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 14400
+- name: prepare-context
+  steps:
+  - type: CheckoutStep
+    name: Checkout Code
+    cloneCredential:
+      type: DefaultCredential
+    withLfs: false
+    withSubmodules: false
+    condition: SUCCESSFUL
+    optional: false
+  - type: CommandStep
+    name: define version
+    runInContainer: true
+    image: alpine:3.19
+    interpreter:
+      type: DefaultInterpreter
+      commands: "set -e\n\nif [ ! -d \".git\" ]; then\n  echo \"ERRO CRÍTICO: Repositório não encontrado.\"\n  echo \"Certifique-se de que o passo 'Checkout Code' está ACIMA deste passo no OneDev.\"\n  ls -la\n  exit 1\nfi\n\napk add --no-cache git\n\ngit config --global --add safe.directory \"*\"\n\n# git fetch --unshallow || true \n\nSAFE_BRANCH=\"$(echo \"@branch@\" | tr '/' '-' | tr '[:upper:]' '[:lower:]')\"\n\nCOMMIT_COUNT=$(git rev-list --count HEAD)\n\nVERSION=\"${SAFE_BRANCH}-${COMMIT_COUNT}\"\n\ncase \"@branch@\" in\n  main|master)\n    ENVIRONMENT=\"prd\"\n    ;;\n  homolog|hml)\n    ENVIRONMENT=\"hml\"\n    ;;\n  *)\n    ENVIRONMENT=\"dev\"\n    ;;\nesac\n\necho \"IMAGE_TAG=$VERSION\" > context.env\necho \"ENVIRONMENT=$ENVIRONMENT\" >> context.env\n\necho \"=== Configuração Definida ===\"\necho \"Método: Git Commit Count\"\necho \"Tag da Imagem: $VERSION\"\necho \"Ambiente: $ENVIRONMENT\"\n"
+    useTTY: false
+    condition: SUCCESSFUL
+    optional: false
+  - type: PublishArtifactStep
+    name: publish context
+    artifacts: context.env
+    condition: SUCCESSFUL
+    optional: false
+  triggers:
+  - type: BranchUpdateTrigger
+    branches: homolog main
+    userMatch: anyone
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 14400
+- name: Defect dojo
+  steps:
+  - type: CommandStep
+    name: Defectdojo
+    runInContainer: true
+    image: python:3.12
+    interpreter:
+      type: DefaultInterpreter
+      commands: "set -euo pipefail\n\npip install --quiet requests urllib3\n\nif [ -f \"context.env\" ]; then\n    . ./context.env\n    export ENVIRONMENT\n    export IMAGE_TAG\nelse\n    echo \"context.env nao encontrado\"\n    exit 1\nfi\n\nexport ONDEV_BRANCH=\"@branch@\"\n\ncat << 'EOF' > provision_defectdojo.py\nimport os\nimport sys\nimport requests\nfrom datetime import datetime, timedelta\nimport urllib3\n\nurllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)\n\nDOJO_URL = os.getenv(\"DEFECTDOJO_URL\", \"\").rstrip(\"/\")\nPROVISIONER_KEY = os.getenv(\"DEFECTDOJO_TOKEN_PROVISIONER\")\nPROJECT_NAME = os.getenv(\"PROJECT_NAME\")\n\nIMAGE_TAG = os.getenv(\"IMAGE_TAG\") \nENVIRONMENT = os.getenv(\"ENVIRONMENT\")\nBRANCH = os.getenv(\"ONDEV_BRANCH\", \"manual\")\n\nenv_configs = {\n    \"dev\": {\"token\": os.getenv(\"DEFECTDOJO_TOKEN_DEV\"), \"lead_id\": os.getenv(\"CI_IMPORTER_DEV_ID\")},\n    \"hml\": {\"token\": os.getenv(\"DEFECTDOJO_TOKEN_HML\"), \"lead_id\": os.getenv(\"CI_IMPORTER_HML_ID\")},\n    \"prd\": {\"token\": os.getenv(\"DEFECTDOJO_TOKEN_PRD\"), \"lead_id\": os.getenv(\"CI_IMPORTER_PRD_ID\")},\n}\n\nconfig = env_configs.get(ENVIRONMENT)\n\nif not config or not config[\"token\"]:\n    print(f\"Ambiente invalido: {ENVIRONMENT}\")\n    sys.exit(1)\n\nIMPORT_TOKEN = config[\"token\"]\nLEAD_ID = config.get(\"lead_id\")\n\ntry:\n    LEAD_ID = int(LEAD_ID)\nexcept (TypeError, ValueError):\n    LEAD_ID = 1\n\nif not all([DOJO_URL, PROVISIONER_KEY, PROJECT_NAME, IMAGE_TAG]):\n    print(\"Variaveis obrigatorias ausentes\")\n    sys.exit(1)\n\nPRODUCT_NAME = f\"{PROJECT_NAME}-{BRANCH.replace('/', '-')}\"\nENGAGEMENT_NAME = IMAGE_TAG \n\nprint(f\"Ambiente: {ENVIRONMENT}\")\nprint(f\"Produto: {PRODUCT_NAME}\")\nprint(f\"Engagement: {ENGAGEMENT_NAME}\")\nprint(f\"Lead ID: {LEAD_ID}\")\n\nHEADERS_PROVISIONER = {\n    \"Authorization\": f\"Token {PROVISIONER_KEY}\",\n    \"Content-Type\": \"application/json\"\n}\n\nr = requests.get(f\"{DOJO_URL}/api/v2/products/?name={PRODUCT_NAME}\", headers=HEADERS_PROVISIONER, verify=False)\nr.raise_for_status()\nresults = r.json().get(\"results\", [])\n\nif results:\n    product_id = results[0][\"id\"]\nelse:\n    payload = {\"name\": PRODUCT_NAME, \"description\": \"Criado via CI/CD\", \"prod_type\": 1}\n    r = requests.post(f\"{DOJO_URL}/api/v2/products/\", headers=HEADERS_PROVISIONER, json=payload, verify=False)\n    r.raise_for_status()\n    product_id = r.json()[\"id\"]\n\ntoday = datetime.utcnow().strftime(\"%Y-%m-%d\")\ntomorrow = (datetime.utcnow() + timedelta(days=1)).strftime(\"%Y-%m-%d\")\n\npayload = {\n    \"name\": ENGAGEMENT_NAME,\n    \"product\": product_id,\n    \"status\": \"In Progress\",\n    \"engagement_type\": \"CI/CD\",\n    \"version\": IMAGE_TAG,\n    \"target_start\": today,\n    \"target_end\": tomorrow,\n    \"lead\": LEAD_ID\n}\n\nr = requests.post(f\"{DOJO_URL}/api/v2/engagements/\", headers=HEADERS_PROVISIONER, json=payload, verify=False)\nr.raise_for_status()\nengagement_id = r.json()[\"id\"]\nprint(f\"Engagement ID: {engagement_id}\")\n\ndef import_scan(scan_type, file_path):\n    if not os.path.exists(file_path):\n        return\n\n    print(f\"Importando {scan_type}...\")\n    HEADERS_IMPORT = {\"Authorization\": f\"Token {IMPORT_TOKEN}\"}\n    \n    with open(file_path, \"rb\") as f:\n        data = {\n            \"scan_type\": scan_type,\n            \"engagement\": engagement_id,\n            \"active\": True,\n            \"verified\": True,\n            \"close_old_findings\": True\n        }\n        r = requests.post(f\"{DOJO_URL}/api/v2/import-scan/\", headers=HEADERS_IMPORT, data=data, files={\"file\": f}, verify=False)\n        r.raise_for_status()\n\nscans = {\n    \"scans/semgrep.json\": \"Semgrep JSON Report\",\n    \"scans/trivy.json\": \"Trivy Scan\",\n    \"scans/bandit.json\": \"Bandit Scan\"\n}\n\nfor path, stype in scans.items():\n    import_scan(stype, path)\n\nwith open(\"defectdojo.env\", \"w\") as f:\n    f.write(f\"DEFECTDOJO_ENGAGEMENT_ID={engagement_id}\\n\")\nEOF\n\npython3 provision_defectdojo.py\n"
+    envVars:
+    - name: DEFECTDOJO_URL
+      value: https://defectdojo.cargolift.com.br/
+    - name: PROJECT_NAME
+      value: '@project_name@'
+    - name: DEFECTDOJO_TOKEN_PROVISIONER
+      value: '@secret:DEFECTDOJO_TOKEN_PROVISIONER@'
+    - name: DEFECTDOJO_TOKEN_DEV
+      value: '@secret:DEFECTDOJO_TOKEN_DEV@'
+    - name: DEFECTDOJO_TOKEN_HML
+      value: '@secret:DEFECTDOJO_TOKEN_HML@'
+    - name: DEFECTDOJO_TOKEN_PRD
+      value: '@secret:DEFECTDOJO_TOKEN_PRD@'
+    - name: CI_IMPORTER_DEV_ID
+      value: '6'
+    - name: CI_IMPORTER_HML_ID
+      value: '7'
+    - name: CI_IMPORTER_PRD_ID
+      value: '8'
+    useTTY: true
+    condition: SUCCESSFUL
+    optional: false
+  triggers:
+  - type: DependencyFinishedTrigger
+  jobDependencies:
+  - jobName: prepare-context
+    requireSuccessful: true
+    artifacts: '**'
+  - jobName: security-scan
+    requireSuccessful: true
+    artifacts: scans/**
+  - jobName: sonar-scan
+    requireSuccessful: true
+    artifacts: '**'
+  retryCondition: never
+  maxRetries: 3
+  retryDelay: 30
+  timeout: 14400
