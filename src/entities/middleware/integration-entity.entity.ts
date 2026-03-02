@@ -10,7 +10,6 @@
  * - O modo de roteamento define como a entidade será processada dentro do middleware (direto, via ODS ou via MDM).
  */
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Schema } from "../../interfaces/schema-validation.interface.js";
 import { EntityMetadata } from "../../interfaces/entity-metadados.interface.js";
 
 
