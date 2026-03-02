@@ -1,6 +1,6 @@
 # @cargolift-cdi/types
 
-![Versão](https://img.shields.io/badge/version-0.1.166-green)
+![Versão](https://img.shields.io/badge/version-0.1.167-green)
 ![Licença](https://img.shields.io/badge/license-MIT-lightgrey)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-blue)
 
