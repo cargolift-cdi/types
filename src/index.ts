@@ -19,26 +19,36 @@ export * from './interfaces/entity-metadados.interface.js';
 export * from './interfaces/audit-trail.interface.js';
 export * from './interfaces/tracking.interface.js';
 
+// Configurações
+export * from './config/rabbit.config.js';
+
 
 // Entidades
 export * from './entities/middleware/integration-agent.entity.js';
+export * from './entities/middleware/agent-endpoint.entity.js';
+export * from './entities/middleware/agent-credential.entity.js';
 export * from './entities/middleware/integration-entity.entity.js';
 export * from './entities/middleware/integration-outbound-snapshot.entity.js';
 export * from './entities/middleware/routing-inbound.entity.js';
 export * from './entities/middleware/routing-outbound.entity.js';
-export * from './entities/middleware/agent-endpoint.entity.js';
-export * from './entities/middleware/agent-credential.entity.js';
 export * from './entities/middleware/diagnostic-latency.entity.js';
+export * from './entities/middleware/integration-tracking.entity.js';
+export * from './entities/middleware/webhook-subscription.entity.js';
+
+// Entidades - Logs
 export * from './entities/middleware/log-routing-inbound.entity.js';
 export * from './entities/middleware/log-routing-outbound.entity.js';
 export * from './entities/middleware/log-mdm.entity.js';
-export * from './entities/middleware/integration-tracking.entity.js';
-export * from './entities/middleware/webhook-subscription.entity.js';
+export * from './entities/middleware/log-ods.entity.js';
 
 // MDM
 export * from './entities/mdm/mdm-base.entity.js';
 export * from './entities/mdm/mdm-driver.entity.js';
 export * from './entities/shared/audit-trail.entity.js';
+
+// ODS
+export * from './entities/ods/ods-base.entity.js';
+export * from './entities/ods/ods-shipment.entity.js';
 
 // Enum
 export * from './enum/integration.enums.js';

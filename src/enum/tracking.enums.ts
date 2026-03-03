@@ -38,6 +38,12 @@ export enum TrackingStepName {
   MDM_COMPLETED = "mdm_completed",
   /** MDM Service roteou para conectores de integração */
   MDM_ROUTING_OUTBOUND = "mdm_routing_outbound",
+  /** ODS Service iniciou processamento */
+  ODS_PROCESSING = "ods_processing",
+  /** ODS Service concluiu persistência e auditoria */
+  ODS_COMPLETED = "ods_completed",
+  /** ODS Service roteou para conectores de integração */
+  ODS_ROUTING_OUTBOUND = "ods_routing_outbound",
   /** Conector de integração iniciou envio para sistema parceiro */
   OUTBOUND_SENDING = "outbound_sending",
   /** Conector de integração recebeu resposta do sistema parceiro */

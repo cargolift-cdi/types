@@ -1,7 +1,7 @@
 import { LogRoutingInbound } from "../entities/middleware/log-routing-inbound.entity.js";
 import { LogRoutingOutbound } from "../entities/middleware/log-routing-outbound.entity.js";
 import { IntegrationTracking } from "../entities/middleware/integration-tracking.entity.js";
-import { ErrorSource, ErrorType, LogMdm } from "../index.js";
+import { ErrorSource, ErrorType, LogMdm, LogOds } from "../index.js";
 
 export interface ContextApplication {
   name: string;
@@ -53,6 +53,7 @@ export interface ContextMessage {
     inbound?: LogRoutingInbound;
     outbound?: LogRoutingOutbound;
     mdm?: LogMdm;
+    ods?: LogOds;
     tracking?: IntegrationTracking;
   };
   // Valor de referência para correlação de mensagens relacionadas, como um ID de negócio, chave de negócio, chave de entidade, etc.
