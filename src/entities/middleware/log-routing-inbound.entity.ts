@@ -18,18 +18,18 @@ export class LogRoutingInbound {
   id!: string; // manter string no TS para bigint seguro
 
   /** Agente de destino (e.g., 'erp', 'wms') */
-  @Column({ name: "agent", type: "varchar", length: 80 })
+  @Column({ name: "agent", type: "varchar", length: 40 })
   agent!: string;
 
   /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   endpoint!: string;
 
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   method!: string;
 
   /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   entity!: string;
 
   /** Ação (e.g., 'create', 'update', 'delete', etc) */

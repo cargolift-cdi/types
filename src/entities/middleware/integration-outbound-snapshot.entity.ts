@@ -26,10 +26,10 @@ export class IntegrationOutboundSnapshot {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string;
 
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   agent!: string;
 
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   entity!: string;
 
   @Column({ type: "varchar", length: 40 })

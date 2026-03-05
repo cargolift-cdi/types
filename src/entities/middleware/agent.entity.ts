@@ -19,7 +19,7 @@ export class MiddlewareAgent {
   id!: string; // manter string no TS para bigint seguro
 
   /** Nome do agente de integração (e.g., 'erp', 'tms') */
-  @Column({ type: 'varchar', length: 80 })
+  @Column({ type: 'varchar', length: 40 })
   agent!: string; 
 
   /** Se o agente está ativo */

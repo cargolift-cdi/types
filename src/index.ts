@@ -24,10 +24,10 @@ export * from './config/rabbit.config.js';
 
 
 // Entidades
-export * from './entities/middleware/integration-agent.entity.js';
+export * from './entities/middleware/agent.entity.js';
 export * from './entities/middleware/agent-endpoint.entity.js';
 export * from './entities/middleware/agent-credential.entity.js';
-export * from './entities/middleware/integration-entity.entity.js';
+export * from './entities/middleware/entity.entity.js';
 export * from './entities/middleware/integration-outbound-snapshot.entity.js';
 export * from './entities/middleware/routing-inbound.entity.js';
 export * from './entities/middleware/routing-outbound.entity.js';

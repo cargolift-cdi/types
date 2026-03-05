@@ -31,11 +31,11 @@ export class MiddlewareAgentEndpoint {
   id!: string; // manter string no TS para bigint seguro
 
   /** Agente de destino (ex.: 'erp', 'wms') */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   agent!: string;
 
   /** Entidade integrada (ex.: 'invoice', 'driver') */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   entity!: string;
 
   /** Ação (ex.: 'create', 'update', 'delete', 'all', 'upsert') */

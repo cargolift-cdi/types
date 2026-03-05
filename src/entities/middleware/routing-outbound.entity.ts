@@ -32,11 +32,11 @@ export class RoutingOutbound {
   id!: string; // manter string no TS para bigint seguro
 
   /** Agente de origem (e.g., 'tms') */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   agent!: string;
 
   /** Entidade (chave) (e.g., 'driver', 'person') */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   entity!: string;
 
   /** Ação  - e.g.: 'create', 'update', 'delete', 'all' ou lista de ações separadas por vírgula (ex.: 'create,update') */

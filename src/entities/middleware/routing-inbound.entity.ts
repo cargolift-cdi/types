@@ -19,7 +19,7 @@ import { SchemaValidation } from "../../interfaces/schema-validation.interface.j
 
 /**
  * Perfil de rotas de integração de entrada (inbound) para validação, transformação e roteamento.
- * Utilize agent + endpoint + method no IntegrationEntity para referenciar estas rotas.
+ * Utilize agent + endpoint + method no MiddlewareEntity para referenciar estas rotas.
  */
 @Entity({ name: "routing_inbound" })
 @Index(["agent", "endpoint", "method", "version"], { unique: true })
@@ -32,11 +32,11 @@ export class RoutingInbound {
   id!: string; // manter string no TS para bigint seguro
 
   /** Agente de integração de origem (e.g., 'erp') */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   agent!: string;
 
   /** Endpoint  (e.g., 'driver', 'cte', etc) */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   endpoint!: string;
 
   /** Método HTTP (e.g., 'GET', 'POST', 'PUT', 'DELETE', etc), será usado para identificar qual a ação que será executada
@@ -45,11 +45,11 @@ export class RoutingInbound {
    * Exemplo: um endpoint de integração que recebe tanto 'POST' para criar um cadastro quanto 'PUT' para atualizar o cadastro, ambos mapeados para a mesma entidade 'driver' mas com ações diferentes ('create' e 'update', por exemplo).
    * Pode-se usar vários métodos para a mesma ação, caso queira mapear 'POST' e 'PUT' para a ação 'upsert', por exemplo. Neste caso, o campo method pode conter uma lista de métodos HTTP (ex: "POST, PUT") e a lógica de roteamento deve considerar isso.
    */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   method!: string;
 
   /** Entidade padrão associada ao endpoint (e.g., 'trip.close' para entidade 'trip.update') */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   entity!: string;    
 
   /** Ação dentro do middleware (e.g., 'create', 'update', 'delete', etc) */
@@ -105,11 +105,11 @@ export class RoutingInbound {
   @Column({ name: "external_reference_extraction", type: "text", nullable: true })
   externalReferenceExtraction?: string | null;
   
-  /** Modo de roteamento que sobrescreve o modo definido na entidade (integration_entity)
+  /** Modo de roteamento que sobrescreve o modo definido na entidade (entity)
    * - 'direct': Roteia diretamente para os agentes de destino sem passar pelo ODS
    * - 'ods': Roteia para o ODS (Operational Data Store) antes de enviar para os agentes de destino
    * - 'mdm': Roteia para fila de dados mestres (MDM) antes de enviar para os agentes de destino
-   * - 'default': Usa o modo definido na entidade (integration_entity)
+   * - 'default': Usa o modo definido na entidade (entity)
    */
   @Column({ name: "override_routing_mode", type: "varchar", length: 20, nullable: true })
   overrideRoutingMode?: "default" | "direct" | "ods" | "mdm" | null;

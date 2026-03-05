@@ -26,11 +26,11 @@ export class LogRoutingOutbound {
   id!: string; // manter string no TS para bigint seguro
 
   /** Sistema de destino (e.g., 'erp', 'wms') */
-  @Column({ name: "agent", type: "varchar", length: 80 })
+  @Column({ name: "agent", type: "varchar", length: 40 })
   agent!: string;
 
   /** Entidade (chave) (e.g., 'driver' or 'driver.created') */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   entity!: string;
 
   /** Ação (e.g., 'create', 'update', 'delete', etc) */

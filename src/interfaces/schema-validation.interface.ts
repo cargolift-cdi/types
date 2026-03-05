@@ -53,7 +53,10 @@ export interface SchemaValidationResult {
   errors: {
     field: string;  // campo que falhou na validação
     value: any;     // valor que falhou na validação
-    error: string;  // mensagem de erro
+    error: {
+        default: string; // mensagem de erro padrão gerada pela regra que falhou
+        custom?: string; // mensagem de erro personalizada definida no schema, se disponível
+    };  // mensagem de erro
     schema?: Schema; // regra que gerou o erro
   }[];
   

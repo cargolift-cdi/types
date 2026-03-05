@@ -35,11 +35,11 @@ export class IntegrationTracking {
   correlationId!: string;
 
   /** Agente de origem — sistema que enviou a requisição (e.g., 'erp', 'wms') */
-  @Column({ name: "agent", type: "varchar", length: 80 })
+  @Column({ name: "agent", type: "varchar", length: 40 })
   agent!: string;
 
   /** Entidade processada (e.g., 'driver', 'trip', 'customer') */
-  @Column({ type: "varchar", length: 80 })
+  @Column({ type: "varchar", length: 40 })
   entity!: string;
 
   /** Ação solicitada (e.g., 'create', 'update', 'upsert', 'delete') */

@@ -13,13 +13,13 @@ import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, Update
 import { EntityMetadata } from "../../interfaces/entity-metadados.interface.js";
 
 
-@Entity({ name: "integration_entity" })
+@Entity({ name: "entity" })
 @Index(["entity", "version"], { unique: true })
-@Index("uq_integration_entity_active", ["entity"], {
+@Index("uq_entity_active", ["entity"], {
   unique: true,
   where: `"active" = true`,
 })
-export class IntegrationEntity {
+export class MiddlewareEntity {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
