@@ -110,6 +110,10 @@ export class LogOds {
   @Column({ type: "text", nullable: true })
   rawPayload?: string | null;
 
+  /** Apenas campos modificados que sofreram alterações (update) */
+  @Column({ type: "text", nullable: true })
+  deltaPayload?: string | null;  
+
   /** Resposta do TypeORM após a operação */
   @Column({ type: "text", nullable: true })
   operationResult?: string | null;
