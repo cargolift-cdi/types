@@ -43,12 +43,20 @@ export class OdsShipment {
   shipmentNumber!: string;
 
   /** Status da viagem/romaneio/manifesto */
-  @Column({ type: "varchar", length: 12 })
-  status!: ShipmentStatus;
+  @Column({ type: "varchar", length: 12, nullable: true })
+  status?: ShipmentStatus;
 
   /** Status externo da viagem/romaneio/manifesto */
   @Column({ type: "varchar", length: 40, nullable: true })
   externalStatus?: string;
+
+  /** Previsão de saída da viagem/romaneio/manifesto */
+  @Column({ name: "estimated_departure", type: "timestamptz", nullable: true })
+  estimatedDeparture?: Date;
+
+  /** Previsão de chegada da viagem/romaneio/manifesto */
+  @Column({ name: "estimated_arrival", type: "timestamptz", nullable: true })
+  estimatedArrival?: Date;
 
   /** Informações não mapeadas e específicas de cada fonte de dados (agentes) */
   @Column({ name: "additional_info", type: "jsonb", nullable: true })

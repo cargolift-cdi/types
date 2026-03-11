@@ -47,7 +47,6 @@ export * from './entities/mdm/mdm-driver.entity.js';
 export * from './entities/shared/audit-trail.entity.js';
 
 // ODS
-export * from './entities/ods/ods-base.entity.js';
 export * from './entities/ods/ods-shipment.entity.js';
 
 // Enum
