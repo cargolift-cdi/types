@@ -23,10 +23,10 @@ export enum ShipmentStatus {
 
 
 
-@Entity({ name: "shipment" })
-@Index(["agent", "branch", "shipmentNumber"], { unique: true })
-export class OdsShipment {
-  /** Identificador único da viagem/romaneio/manifesto */
+@Entity({ name: "transportation_order" })
+@Index(["agent", "customerOrderNumber", "customerTaxId"], { unique: true })
+export class OdsTransportationOrder {
+  /** Identificador único da ordem de transporte do cliente*/
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
 
@@ -38,45 +38,52 @@ export class OdsShipment {
   @Column({ name: "branch", type: "varchar", length: 14, nullable: true })
   branch?: string;  
 
-  /** Número da viagem/romaneio/manifesto */
-  @Column({ name: "shipment_number", type: "varchar", length: 20 })
-  shipmentNumber!: string;
+  /** Número da ordem de transporte do cliente */
+  @Column({ name: "customer_order_number", type: "varchar", length: 20, nullable: true })
+  customerOrderNumber?: string;
 
-  /** Status da viagem/romaneio/manifesto */
+  /** Número da ordem de transporte */
+  @Column({ name: "order_number", type: "varchar", length: 20 })
+  orderNumber!: string;
+
+  /** Status da ordem de transporte */
   @Column({ type: "varchar", length: 12, nullable: true })
   status?: ShipmentStatus;
 
-  /** Status externo da viagem/romaneio/manifesto */
+  /** Status externo da ordem de transporte */
   @Column({ type: "varchar", length: 40, nullable: true })
   externalStatus?: string;
+
+  /** Identificador fiscal do cliente (CNPJ, EIN, VAT Number, etc) */
+  @Column({ name: "customer_tax_id", type: "varchar", length: 20, nullable: true })
+  customerTaxId?: string;
+
+  /** Identificador fiscal da origem do transporte (CNPJ, EIN, VAT Number, etc) */
+  @Column({ name: "origin_tax_id", type: "varchar", length: 20, nullable: true })
+  originTaxId?: string;
+
+  /** Identificador fiscal do destino do transporte (CNPJ, EIN, VAT Number, etc) */
+  @Column({ name: "destination_tax_id", type: "varchar", length: 20, nullable: true })
+  destinationTaxId?: string;
 
   // --------------------------------------------------------------------------------------
   // Datas previstas e confirmadas para os eventos de transporte
   // --------------------------------------------------------------------------------------
-  /** Previsão de saída da viagem/romaneio/manifesto */
-  @Column({ name: "estimated_departure", type: "timestamptz", nullable: true })
-  estimatedDeparture?: Date;
+  /** Data de solicitação pelo cliente para a coleta da ordem de transporte*/
+  @Column({ name: "pickup_request", type: "timestamptz", nullable: true })
+  pickupRequest?: Date;
 
-  /** Previsão de coleta */
-  @Column({ name: "estimated_pickup", type: "timestamptz", nullable: true })
-  estimatedPickup?: Date;
+  /** Data de solicitação pelo cliente para a entrega da ordem de transporte */
+  @Column({ name: "delivery_request", type: "timestamptz", nullable: true })
+  deliveryRequest?: Date;
 
-  /** Previsão de entrega da viagem/romaneio/manifesto */
-  @Column({ name: "estimated_delivery", type: "timestamptz", nullable: true })
-  estimatedDelivery?: Date;
-
-  /** Data confirmada pelo transportador para a saída da viagem/romaneio/manifesto */
-  @Column({ name: "confirmed_departure", type: "timestamptz", nullable: true })
-  confirmedDeparture?: Date;
-
-  /** Data confirmada pelo transportador para a coleta da viagem/romaneio/manifesto */
+  /** Data confirmada pelo transportador para a coleta da ordem de transporte */
   @Column({ name: "confirmed_pickup", type: "timestamptz", nullable: true })
   confirmedPickup?: Date;
 
-  /** Data confirmada pelo transportador para a entrega da viagem/romaneio/manifesto */
+  /** Data confirmada pelo transportador para a entrega da ordem de transporte */
   @Column({ name: "confirmed_delivery", type: "timestamptz", nullable: true })
   confirmedDelivery?: Date;
-  // --------------------------------------------------------------------------------------
 
 
   /** Informações não mapeadas e específicas de cada fonte de dados (agentes) */
@@ -86,7 +93,7 @@ export class OdsShipment {
 
   // --------------------------------------------------------------------------------------
   // Campos de controle de criação, atualização e exclusão lógica (soft delete)
-  // --------------------------------------------------------------------------------------  
+  // --------------------------------------------------------------------------------------    
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
 
