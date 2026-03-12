@@ -14,14 +14,6 @@ import {
   DeleteDateColumn
 } from "typeorm";
 
-export enum ShipmentStatus {
-  PLANNED = "planned",
-  IN_TRANSIT = "in_transit",
-  DELIVERED = "delivered",
-  CANCELLED = "cancelled",
-}
-
-
 
 @Entity({ name: "transportation_order" })
 @Index(["agent", "customerOrderNumber", "customerTaxId"], { unique: true })
@@ -48,7 +40,7 @@ export class OdsTransportationOrder {
 
   /** Status da ordem de transporte */
   @Column({ type: "varchar", length: 12, nullable: true })
-  status?: ShipmentStatus;
+  status?: string;
 
   /** Status externo da ordem de transporte */
   @Column({ type: "varchar", length: 40, nullable: true })

@@ -48,6 +48,7 @@ export * from './entities/shared/audit-trail.entity.js';
 
 // ODS
 export * from './entities/ods/ods-shipment.entity.js';
+export * from './entities/ods/ods-transportation-order.entity.js';
 
 // Enum
 export * from './enum/integration.enums.js';
