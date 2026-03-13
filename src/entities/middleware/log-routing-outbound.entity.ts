@@ -17,10 +17,9 @@ import { IntegrationActions } from "src/interfaces/integration.interface.js";
  */
 @Entity({ name: "log_routing_outbound" })
 @Index(["id"], { unique: true })
-@Index(["agent", "entity", "action", "correlationId"], { unique: true })
-@Index(["correlationId"])
-@Index(["status", "updatedAt"])
-@Index(["agent", "entity", "updatedAt"])
+@Index(["correlationId"], { unique: true })
+@Index(["agent", "entity", "timestampOriginStart"])
+@Index(["updatedAt"])
 export class LogRoutingOutbound {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
@@ -101,13 +100,13 @@ export class LogRoutingOutbound {
   @Column({ type: 'text', nullable: true })
   enrichedPayload?: string | null;
 
-  /** Resposta recebida do sistema de destino (corpo da resposta HTTP) */
-  @Column({ name: "response_body", type: 'text', nullable: true })
-  responseBody?: string | null;
-
   /** Status HTTP da resposta do sistema de destino */
   @Column({ name: "response_status", type: 'int', nullable: true })
   responseStatus?: number | null;
+
+  /** Resposta recebida do sistema de destino (corpo da resposta HTTP) */
+  @Column({ name: "response_body", type: 'text', nullable: true })
+  responseBody?: string | null;
 
   /** Mensagem completa do erro */
   @Column({ type: 'text', nullable: true })
@@ -125,7 +124,10 @@ export class LogRoutingOutbound {
   @Column({ type: 'varchar', length: 15, nullable: true })
   errorSource?: ErrorSource | null;
 
-   /** Timestamp de início de origem onde a mensagem/requisição foi gerada */
+  //--------------------------------------------------------------------------------
+  // Campos de monitoramento de tempo e performance para análise de gargalos e SLAs
+  //--------------------------------------------------------------------------------
+  /** Timestamp de início de origem onde a mensagem/requisição foi gerada */
   @Column({ name: "timestamp_origin_start", type: "timestamptz", nullable: true })
   timestampOriginStart?: Date | string;
 
@@ -152,6 +154,7 @@ export class LogRoutingOutbound {
   /** Duração total do ciclo de vida end-to-end em milissegundos */
   @Column({ name: "duration_lifetime_ms", type: "int", nullable: true })
   durationLifetime?: number | null;
+  //--------------------------------------------------------------------------------
 
 
   /** ID da tabela routing_outbound */

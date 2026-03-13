@@ -9,10 +9,8 @@ import { ErrorSource, ErrorType } from "../../enum/error-type.enum.js";
 @Entity({ name: "log_routing_inbound" })
 @Index(["id"], { unique: true })
 @Index(["correlationId"], { unique: true })
-@Index(["agent", "entity", "action"])
-@Index(["externalReference", "entity", "action"])
-@Index(["status", "updatedAt"])
-@Index(["agent", "entity", "updatedAt"])
+@Index(["agent", "entity", "timestampOriginStart"])
+@Index(["updatedAt"])
 export class LogRoutingInbound {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
@@ -49,7 +47,7 @@ export class LogRoutingInbound {
    * Formato: Chave-Valor (Tipo-Referência)
    * Exemplo: { "cte": "000123", "cnpj": "12345678000199" }
    */
-    @Column({ name: "external_reference", type: "jsonb", nullable: true })
+  @Column({ name: "external_reference", type: "jsonb", nullable: true })
   externalReference?: Record<string, any> | null;
 
   /**
@@ -117,7 +115,9 @@ export class LogRoutingInbound {
   @Column({ name: "error_source", type: "varchar", length: 15, nullable: true })
   errorSource?: ErrorSource | null;
 
-
+  //--------------------------------------------------------------------------------
+  // Campos de monitoramento de tempo e performance para análise de gargalos e SLAs
+  //--------------------------------------------------------------------------------
   /** Timestamp de início de origem onde a mensagem/requisição foi gerada */
   @Column({ name: "timestamp_origin_start", type: "timestamptz", nullable: true })
   timestampOriginStart?: Date | string;
@@ -145,7 +145,7 @@ export class LogRoutingInbound {
   /** Duração total do ciclo de vida end-to-end em milissegundos */
   @Column({ name: "duration_lifetime_ms", type: "int", nullable: true })
   durationLifetime?: number | null;
-
+  //--------------------------------------------------------------------------------
 
   /** ID da tabela routing_inbound */
   @Column({ name: "inbound_id", type: "bigint", nullable: true })

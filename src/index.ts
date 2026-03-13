@@ -1,6 +1,3 @@
-import { setServers } from 'dns';
-import { setDefaultCACertificates } from 'tls';
-
 /**
  * Public export surface for shared types.
  * Keep exports stable to avoid breaking downstream projects.
@@ -17,7 +14,6 @@ export * from './interfaces/schema-validation.interface.js';
 export * from './interfaces/entity-metadados.interface.js';
 
 export * from './interfaces/audit-trail.interface.js';
-export * from './interfaces/tracking.interface.js';
 
 // Configurações
 export * from './config/rabbit.config.js';

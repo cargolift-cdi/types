@@ -1,5 +1,5 @@
+import { RetryPolicy } from "../../interfaces/integration.interface";
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { WebhookRetryPolicy } from "../../interfaces/tracking.interface.js";
 
 /**
  * Configuração de inscrição de webhook para um agente de integração.
@@ -67,7 +67,7 @@ export class WebhookSubscription {
    * Padrão: { maxRetries: 3, backoffMs: [1000, 5000, 30000] }
    */
   @Column({ name: "retry_policy", type: "jsonb", nullable: true, default: () => "'{\"maxRetries\": 3, \"backoffMs\": [1000, 5000, 30000]}'" })
-  retryPolicy?: WebhookRetryPolicy | null;
+  retryPolicy?: RetryPolicy | null;
 
   /**
    * Headers customizados a serem enviados junto com a notificação.

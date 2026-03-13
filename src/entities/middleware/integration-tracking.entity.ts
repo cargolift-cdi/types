@@ -16,16 +16,22 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { IntegrationStatus } from "../../enum/integration.enums.js";
 import { TrackingCurrentStep } from "../../enum/tracking.enums.js";
-import { TrackingStep } from "../../interfaces/tracking.interface.js";
+
+export class TrackingOutboundRouteStatus {
+    [routeName: string]: {
+      status: IntegrationStatus;
+      statusCode: number;
+      statusReason?: string | null;
+      responseData?: Record<string, any> | null;
+    };
+  }
 
 
 @Entity({ name: "integration_tracking" })
 @Index(["id"], { unique: true })
 @Index(["correlationId"], { unique: true })
-@Index(["agent", "entity", "action"])
 @Index(["status", "updatedAt"])
-@Index(["currentStep", "status"])
-@Index(["agent", "entity", "updatedAt"])
+@Index(["expiresAt"])
 export class IntegrationTracking {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
   id!: string; // manter string no TS para bigint seguro
@@ -78,39 +84,45 @@ export class IntegrationTracking {
   @Column({ name: "current_step", type: "varchar", length: 40, nullable: false })
   currentStep!: TrackingCurrentStep;
 
-  /**
-   * Array de steps percorridos no pipeline (JSONB).
-   * Cada elemento é um TrackingStep com step, service, status, timestamps, etc.
-   * Permite visualizar o histórico completo do processamento.
-   *
-   * Append atômico via SQL: `steps = steps || $1::jsonb`
-   */
-  @Column({ type: "jsonb", nullable: false, default: () => "'[]'" })
-  steps!: TrackingStep[];
+  /** Total de rotas outbound a serem integradas */
+  @Column({ name: "total_outbound_routes", type: "int", default: 0, nullable: true })
+  totalOutboundRoutes?: number | null;
 
-  /** Indica se webhook foi disparado para este tracking */
-  @Column({ name: "webhook_delivered", type: "boolean", default: false })
-  webhookDelivered!: boolean;
+  /** Total de rotas outbound integradas */
+  @Column({ name: "completed_outbound_routes", type: "int", default: 0, nullable: true })
+  completedOutboundRoutes?: number | null;
 
-  /** Timestamp de quando o webhook foi entregue */
-  @Column({ name: "webhook_delivered_at", type: "timestamptz", nullable: true })
-  webhookDeliveredAt?: Date | null;
+  /** Status individual de cada rota */
+  @Column({ name: "status_outbound_routes", type: "jsonb", nullable: true })
+  statusOutboundRoutes?: TrackingOutboundRouteStatus | null;
 
+
+  /** Quantidade de tentativas realizadas até o sucesso ou falha definitiva */
+  @Column({ name: "retries", type: "int", nullable: true })
+  retries?: number | null;
+
+
+
+
+  //--------------------------------------------------------------------------------
+  // Campos de monitoramento de tempo e performance para análise de gargalos e SLAs
+  //--------------------------------------------------------------------------------
   /** Timestamp de origem — quando a requisição foi gerada pelo sistema parceiro */
-  @Column({ name: "timestamp_origin_start", type: "timestamptz", nullable: true })
-  timestampOriginStart?: Date | string;
+  @Column({ name: "timestamp_start", type: "timestamptz", nullable: true })
+  timestampStart?: Date | string;
 
   /** Timestamp de quando o pipeline concluiu (sucesso ou falha definitiva) */
   @Column({ name: "timestamp_end", type: "timestamptz", nullable: true })
   timestampEnd?: Date | null;
 
   /** Duração total do ciclo de vida end-to-end em milissegundos */
-  @Column({ name: "duration_lifetime_ms", type: "int", nullable: true })
-  durationLifetimeMs?: number | null;
+  @Column({ name: "duration_ms", type: "int", nullable: true })
+  durationMs?: number | null;
+  //--------------------------------------------------------------------------------
 
-  /** Política de retenção: 'long' (tracking) ou 'short' (logs detalhados) */
-  @Column({ name: "retention_policy", type: "varchar", length: 20, default: "long" })
-  retentionPolicy!: string;
+  /** Data de expiração do tracking */
+  @Column({ name: "expires_at", type: "timestamptz", nullable: true })
+  expiresAt?: Date | null;
 
   @CreateDateColumn({ name: "created_at", type: "timestamptz" })
   createdAt!: Date;
