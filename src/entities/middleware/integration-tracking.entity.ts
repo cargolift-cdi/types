@@ -85,11 +85,11 @@ export class IntegrationTracking {
   currentStep!: TrackingCurrentStep;
 
   /** Total de rotas outbound a serem integradas */
-  @Column({ name: "total_outbound_routes", type: "int", default: 0, nullable: true })
+  @Column({ name: "total_outbound_routes", type: "int", nullable: true })
   totalOutboundRoutes?: number | null;
 
   /** Total de rotas outbound integradas */
-  @Column({ name: "completed_outbound_routes", type: "int", default: 0, nullable: true })
+  @Column({ name: "completed_outbound_routes", type: "int", nullable: true })
   completedOutboundRoutes?: number | null;
 
   /** Status individual de cada rota */
