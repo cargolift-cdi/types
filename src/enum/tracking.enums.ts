@@ -19,4 +19,6 @@ export enum TrackingCurrentStep {
   PROCESSED_ODS = "processed_ods",
   /** Processando no conector de integração (outbound HTTP) */
   PROCESSING_OUTBOUND = "processing_outbound",
+  /** Processamento concluído no conector de integração (outbound HTTP) */
+  PROCESSED_OUTBOUND = "processed_outbound",
 }

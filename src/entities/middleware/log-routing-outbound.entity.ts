@@ -17,8 +17,8 @@ import { IntegrationActions } from "src/interfaces/integration.interface.js";
  */
 @Entity({ name: "log_routing_outbound" })
 @Index(["id"], { unique: true })
-@Index(["correlationId"], { unique: true })
-@Index(["agent", "entity", "timestampOriginStart"])
+@Index(["agent", "entity", "action", "correlationId"], { unique: true })
+@Index(["correlationId"])
 @Index(["updatedAt"])
 export class LogRoutingOutbound {
   @PrimaryGeneratedColumn("identity", { type: "bigint", generatedIdentity: "ALWAYS" })
