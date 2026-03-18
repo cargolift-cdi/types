@@ -31,6 +31,8 @@ export enum IntegrationStatus {
   FAILED = 'failed',
   RETRYING = 'retrying',
   DISCARDED = 'discarded',
+  // Status parcials para rotas de saída, quando nem todas rotas de saída concluíram com sucesso
+  PARTIAL_SUCCESS = 'partial_success',
 }
 
 

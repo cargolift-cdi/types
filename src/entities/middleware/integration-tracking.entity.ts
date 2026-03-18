@@ -92,6 +92,10 @@ export class IntegrationTracking {
   @Column({ name: "completed_outbound_routes", type: "int", nullable: true })
   completedOutboundRoutes?: number | null;
 
+  /** Total de rotas outbound com falha */
+  @Column({ name: "failed_outbound_routes", type: "int", nullable: true })
+  failedOutboundRoutes?: number | null;
+
   /** Status individual de cada rota */
   @Column({ name: "status_outbound_routes", type: "jsonb", nullable: true })
   statusOutboundRoutes?: TrackingOutboundRouteStatus | null;
